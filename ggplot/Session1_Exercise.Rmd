@@ -1,0 +1,223 @@
+---
+title: "Session1_Exercise"
+author: "Lauren"
+date: "March 28, 2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Introduction to Markdown
+
+Welcome ! This Markdown document is set up to export this analysis into word. Including all of the code, plots, and outputs. We can see what options are applied globally in the above "chunk", where `echo=true`. Echo will repeat the R code back to you, evaluate the code and also include the output.
+
+As a reminder the data and materials can be found at: [https://github.com/GISKid/mapdatascience/](https://github.com/GISKid/mapdatascience/)
+
+Above this chunk is the YAML header. You can edit this to include today's date and your name.
+
+In Markdown there are a few ways to format text. Two `**` wrapped around a word will **bold** it, whereas this is *italics*.
+
+We can specify different header levels with `#`. 
+
+# header 1
+
+## header 2
+
+### header 3
+
+
+We can also include links [Mapdatascience](www.mapdatascience.com)
+and images ![Alt text](https://www.r-project.org/Rlogo.png)
+
+For all the possibilities in R Markdown view the [cheatsheet](https://rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf)
+
+##Structure for RMarkdown
+
+The first chunk is the "setup" where you specify defaults. Add the following to your setup:
+
+`fig.path = 'Figs/', dev="png",dpi=300`
+
+When you click "knit" this will save all generated plots by their chunk name into a folder called "figs". It will also save them as a .png file and 300 dpi.
+
+The second chunk should be where you load your data or libraries. 
+
+The third chunk should be where you write any custom functions for easy access and editing (not covered in this webinar)
+
+Every chunk after that can be your analysis workbook.
+
+
+##Reading in Data
+
+In `readxl` we specify the type of column name so it reads in correctly into R. 
+
+```{r load data}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+#library(tidyverse)
+
+wildfire_table<-readxl::read_excel("./Data/wildfires_table.xlsx", col_types=c("text","numeric","text","text","text","numeric","numeric","numeric","text","text","numeric","numeric","numeric","text","text","numeric"))
+```
+
+
+##Introduction to data set
+
+The data we are using is [BC Historical Wildlfires](https://catalogue.data.gov.bc.ca/dataset/fire-incident-locations-historical) from the open data catalogue.
+From their description:
+
+>Wildfire historic incident point locations for all fire seasons before the current season. Supplied through various sources. Not to be used for legal purposes. This data includes all incidents tracked by BC Wildfire Service, ie. actual fires, suspected fires, nuisance fires, smoke chases, etc. On April 1 of each year this layer is updated with the previous fire season's data.
+
+
+```{r intro}
+
+head(wildfire_table)
+
+```
+
+The main fields we will be focusing on are `FIRE_TYPE`,`FIRE_CAUSE`,`FIRE_YEAR `,`CURRENT_SIZE`, and `IGNITION_DATE`
+
+FIRE_CAUSE is the suspected cause of the fire, e.g., Lightning, Person.
+
+FIRE_TYPE defines the type of incident that occurred, e.g., Fire of Note, New, Modified/Monitored, Full Response.
+
+FIRE_YEAR represents the fiscal year, April 1 to March 31.
+
+IGNITION_DATE is the discovery date of the fire.
+
+CURRENT_SIZE is the estimated size of the area within the outside perimeter of the incident, in hectares.
+
+
+##Exploratory Analysis of Wildfires
+
+Let's set out to investigate these questions first:
+
+1) How many entries of fires do we have for a given year?
+
+2) What is the minimum and maximum year that we have for our data?
+
+3) What is the average number of fires in a year?
+
+The following chunk uses `dplyr` `%>%` pipes to summarize our data.
+Here we are "grouping" our table by the "FIRE_YEAR" column to count the number of rows by year in the table. Then we are arranging the counts by largest to smallest.
+
+In the second line, we are assigned `wild_sum` as a variable to summarize average number of fires in a year, the minimum and maximum by occurrence.
+
+```{r exploratory analysis}
+
+
+
+wildfire_table %>%group_by(FIRE_YEAR)%>%count()%>%arrange(desc(n))
+
+wild_sum<-wildfire_table %>%group_by(FIRE_YEAR)%>%count()%>%ungroup()%>%summarize(average=mean(n),min=min(n),max=max(n))
+
+
+
+```
+
+Our wildfire data set ranges from `r min(wildfire_table$FIRE_YEAR)` and `r max(wildfire_table$FIRE_YEAR)`
+
+Using `dplyr` we can quickly summarize the number of fires that occurred in a given year. On average there are `r wild_sum$average` fires over the time period.
+
+We can further drill down to the "Ignition date" which is in numeric format. The first few rows indicate that the pattern appears to be `YYYYMMDD`.
+We can reformat this into a date that we can use to work with ggplot2. To reformat we will be using the function `parse_date_time` from the lubridate package (part of the tidyverse!). This function allows you to specify the column of dates you want to reformat, and the order of formatting for the dates. For example, "ymd" will match match all the possible dates in year, month, day order. Formatting orders might include arbitrary separators. These are discarded. See `?parse_date_time` in your console for more information.
+
+
+```{r reformat date}
+wildfire_table<-wildfire_table %>%
+    mutate(IGN_DATE = parse_date_time(IGN_DATE,"ymd"))
+
+```
+
+Let's look at the min and max of the IGN_DATE field.
+
+```{r minmax}
+min(wildfire_table$IGN_DATE,na.rm=TRUE)
+max(wildfire_table$IGN_DATE,na.rm=TRUE)
+
+```
+
+Uh-oh, our other field `FIRE_YEAR` has a minimum of 1950. What about dates that didn't match our format? We can investigate this further by:
+
+Filter will filter the table to match your specifications. `year` will automatically take the "year" out of the IGN_DATE and match it to any year that = 1930.
+
+Note we use two `==` here.
+
+The `!` negates the matching values in the filter. Here we are removing any rows from our wildfire_table that are equal to 1930. 
+
+
+```{r fix date}
+
+wildfire_table %>% filter(year(IGN_DATE)==1930)
+
+wildfire_table %>%filter(is.na(IGN_DATE))
+
+wildfire_table<-wildfire_table%>%filter(!year(IGN_DATE)==1930)
+
+```
+
+##Plotting in ggplot2
+
+Histograms are a great start for exploratory analysis. Here we specify the `data` aka what data we want to plot. 
+The `aes` parameter is the *aesthetic*. Here we typically specify x and/or y values to map to our plot. 
+Since we are using a histogram, we only need to map the values on the x-axis. Then we enclose this in brackets and add in `geom_histogram()` after the `+` sign.
+
+You can think of this code as first, specifying the data, the columns and then the type of plot (histogram).
+
+We will be diving into all the different plots, ways to specify axes, colours, size, etc. on Thursday.
+
+Feel free to experiment with the plots below. You can also check the vignettes and help to read more. [https://ggplot2.tidyverse.org/](https://ggplot2.tidyverse.org/)
+
+```{r histogram}
+
+ggplot(data=wildfire_table, aes(x=FIRE_YEAR))+
+  geom_histogram() 
+
+
+ggplot(data=wildfire_table, aes(x=FIRE_CAUSE))+
+  geom_histogram(stat = "count") 
+
+
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_histogram(stat = "count") 
+
+```
+
+We get errors here when using categorical variables. `ggplot2` will typically alert you to when you're trying to do something sub-optimal. 
+
+If we take a look at [https://ggplot2.tidyverse.org/reference/geom_histogram.html](https://ggplot2.tidyverse.org/reference/geom_histogram.html) it indicates:
+
+>**Histograms** Visualize the distribution of a single continuous variable by dividing the x axis into bins and counting the number of observations in each bin. Histograms (geom_histogram()) display the counts with bars; frequency polygons (geom_freqpoly()) display the counts with lines. Frequency polygons are more suitable when you want to compare the distribution across the levels of a categorical variable.
+
+For Bar Charts:
+
+>There are two types of bar charts: geom_bar() and geom_col(). geom_bar() makes the height of the bar proportional to the number of cases in each group (or if the weight aesthetic is supplied, the sum of the weights). If you want the heights of the bars to represent values in the data, use geom_col() instead. geom_bar() uses stat_count() by default: it counts the number of cases at each x position. geom_col() uses stat_identity(): it leaves the data as is.
+
+Therefore, categorical variables should be using `geom_bar`.
+
+
+```{r freq}
+
+ggplot(data=wildfire_table, aes(x=FIRE_CAUSE))+
+  geom_bar(stat = "count") 
+
+
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar() 
+
+```
+
+
+
+## Questions
+
+1. Read `wildfire_table` into R without specifying column names. What happens in the R console? 
+   Why do you think this happens?
+   
+2. What elements are missing from these graphs that would make them more visually appealing?
+
+3. What is a binwidth used for in histograms?
+
+
+Thursday, we tackle the aesthetics of ggplot2.
