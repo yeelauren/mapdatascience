@@ -4,4 +4,4 @@ Data Science is a growing field. Many data scientists are not geographers, but *
 
 More updates and content coming soon.
 
-For Data Visualization in GGplot2 [click through](www.mapdatascience.com/ggplot2)
+For Data Visualization in GGplot2 [click through](www.mapdatascience.com/ggplot)
