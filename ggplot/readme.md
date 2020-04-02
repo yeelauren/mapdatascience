@@ -2,6 +2,8 @@ Data Visualization in ggplot2 and R Markdown
 
 Session 1 : [Session 1 Presentation](http://www.mapdatascience.com/ggplot/Session1_pres.html)
 
+Session 2 : [Session 2 Presentation](http://www.mapdatascience.com/ggplot/Session2_pres.html)
+
 Download Exercises:
 
 Method 1:
