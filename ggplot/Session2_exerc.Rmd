@@ -1,0 +1,476 @@
+---
+title: "Session2_exercise"
+author: "Lauren"
+date: "April 2, 2020"
+output: word_document
+---
+
+```{r setup, include=FALSE,fig.path = 'Figs/', dev="png",dpi=300}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Session 2
+
+*Note:* This document as is, will not "knit" since there are chunks that need to be corrected and fixed by us! I've included some of Session 1 in this document as a reminder for the initial steps we took (that we will need for this analysis!)
+
+
+#Introduction to Markdown
+
+Welcome ! This Markdown document is set up to export this analysis into word. Including all of the code, plots, and outputs. We can see what options are applied globally in the above "chunk", where `echo=true`. Echo will repeat the R code back to you, evaluate the code and also include the output.
+
+As a reminder the data and materials can be found at: [https://github.com/GISKid/mapdatascience/](https://github.com/GISKid/mapdatascience/)
+
+Above this chunk is the YAML header. You can edit this to include today's date and your name.
+
+##Reading in Data
+
+In `readxl` we specify the type of column name so it reads in correctly into R. 
+
+```{r load data}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+#library(tidyverse)
+
+wildfire_table<-readxl::read_excel("./Data/wildfires_table.xlsx", col_types=c("text","numeric","text","text","text","numeric","numeric","numeric","text","text","numeric","numeric","numeric","text","text","numeric"))
+```
+
+
+##Introduction to data set
+
+The data we are using is [BC Historical Wildlfires](https://catalogue.data.gov.bc.ca/dataset/fire-incident-locations-historical) from the open data catalogue.
+From their description:
+
+>Wildfire historic incident point locations for all fire seasons before the current season. Supplied through various sources. Not to be used for legal purposes. This data includes all incidents tracked by BC Wildfire Service, ie. actual fires, suspected fires, nuisance fires, smoke chases, etc. On April 1 of each year this layer is updated with the previous fire season's data.
+
+
+```{r intro}
+
+head(wildfire_table)
+
+```
+
+The main fields we will be focusing on are `FIRE_TYPE`,`FIRE_CAUSE`,`FIRE_YEAR `,`CURRENT_SIZE`, and `IGNITION_DATE`
+
+FIRE_CAUSE is the suspected cause of the fire, e.g., Lightning, Person.
+
+FIRE_TYPE defines the type of incident that occurred, e.g., Fire of Note, New, Modified/Monitored, Full Response.
+
+FIRE_YEAR represents the fiscal year, April 1 to March 31.
+
+IGNITION_DATE is the discovery date of the fire.
+
+CURRENT_SIZE is the estimated size of the area within the outside perimeter of the incident, in hectares.
+
+
+##Exploratory Analysis of Wildfires
+
+Let's set out to investigate these questions first:
+
+1) How many entries of fires do we have for a given year?
+
+2) What is the minimum and maximum year that we have for our data?
+
+3) What is the average number of fires in a year?
+
+The following chunk uses `dplyr` `%>%` pipes to summarize our data.
+Here we are "grouping" our table by the "FIRE_YEAR" column to count the number of rows by year in the table. Then we are arranging the counts by largest to smallest.
+
+In the second line, we are assigned `wild_sum` as a variable to summarize average number of fires in a year, the minimum and maximum by occurrence.
+
+```{r exploratory analysis}
+
+
+
+wildfire_table %>%group_by(FIRE_YEAR)%>%count()%>%arrange(desc(n))
+
+wild_sum<-wildfire_table %>%group_by(FIRE_YEAR)%>%count()%>%ungroup()%>%summarize(average=mean(n),min=min(n),max=max(n))
+
+
+
+```
+
+Our wildfire data set ranges from `r min(wildfire_table$FIRE_YEAR)` and `r max(wildfire_table$FIRE_YEAR)`
+
+Using `dplyr` we can quickly summarize the number of fires that occurred in a given year. On average there are `r wild_sum$average` fires over the time period.
+
+We can further drill down to the "Ignition date" which is in numeric format. The first few rows indicate that the pattern appears to be `YYYYMMDD`.
+We can reformat this into a date that we can use to work with ggplot2. To reformat we will be using the function `parse_date_time` from the lubridate package (part of the tidyverse!). This function allows you to specify the column of dates you want to reformat, and the order of formatting for the dates. For example, "ymd" will match match all the possible dates in year, month, day order. Formatting orders might include arbitrary separators. These are discarded. See `?parse_date_time` in your console for more information.
+
+
+```{r reformat date}
+wildfire_table<-wildfire_table %>%
+    mutate(IGN_DATE = parse_date_time(IGN_DATE,"ymd"))
+
+```
+
+h-oh, our other field `FIREYEAR` has a minimum of 1950. What about dates that didn't match our format? We can investigate this further by:
+
+```{r fix date}
+
+wildfire_table %>% filter(year(IGN_DATE)==1930)
+
+wildfire_table %>%filter(is.na(IGN_DATE))
+
+wildfire_table<-wildfire_table%>%filter(!year(IGN_DATE)==1930)
+
+```
+
+
+*Highlight here and run "Run all chunks above"
+##Session 2 Exercises
+
+
+A short cut to quickly insert chunks is CTRL + ALT + I (try it!)
+
+If we change the shape to an "X" we can view the help to find the list of shapes
+`shape=9`
+
+
+```{r plot shape, echo=TRUE}
+ggplot(data=mpg, aes(x=displ,y=hwy,shape=9))+
+    geom_point()
+```
+
+
+We get an error here because we put shape in the wrong place.
+
+Where can we put shape? Move shape to the correct place
+
+```{r plot shape, echo=TRUE}
+ggplot(data=mpg, aes(x=displ,y=hwy))+
+    geom_point()
+```
+
+
+###Bar Charts
+
+```{r barchart}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE))
+
+
+```
+
+The *duplicate* in FIRE_TYPE should probably be removed:
+
+```{r remove dup}
+wildfire_table<-wildfire_table%>%filter(!FIRE_TYPE=="Duplicate")
+
+
+```
+
+##Position of bars
+
+
+
+```{r barchart_pos}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE),position = "dodge2")+
+  labs(title="dodge2")
+
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE),position = "dodge")+
+  labs(title="dodge")
+
+
+
+```
+
+#Boxplot
+
+```{r boxplot}
+wildfire_table %>%group_by(FIRE_CAUSE)%>%
+  summarize(mean_size=mean(SIZE_HA,na.rm=T),
+            median=median(SIZE_HA,na.rm=T),
+            max = max(SIZE_HA,na.rm=T), 
+            min = min(SIZE_HA,na.rm=T))
+
+
+wildfire_table%>%filter(FIRE_YEAR %in% c(2017,2018))%>%
+ggplot(aes(x=as.factor(FIRE_YEAR),y=SIZE_HA))+
+  geom_boxplot()
+
+```
+
+This boxplot is hard to make out. I suspect it is because there are fire sizes that include 0, either as an unknown or it was not measured. For our purposes, we will filter out these variables where FIRE_HA==0
+
+```{r boxplot}
+wildfire_table %>%
+  filter(!SIZE_HA==0)%>%
+  group_by(FIRE_CAUSE)%>%
+  summarize(mean_size=mean(SIZE_HA,na.rm=T),
+            median=median(SIZE_HA,na.rm=T),
+            max = max(SIZE_HA,na.rm=T), 
+            min = min(SIZE_HA,na.rm=T))
+
+
+wildfire_table%>%filter(!SIZE_HA==0)%>%
+ggplot(aes(x=FIRE_CAUSE,y=SIZE_HA))+
+  geom_boxplot()+
+  ylim(0,0.2)
+
+```
+
+Here we are using ylim to limit the y-axis so we can see the boxplots.  Outliers are points outside the boxes, and the thick black line is represented by the median. 
+
+Let's use a built in example with cleaner data using the mpg data set:
+
+```{r box_ex,eval=TRUE}
+ggplot(mpg, aes(class, hwy))+
+  geom_boxplot()
+
+```
+
+We can layer a geom_jitter to on top of the boxplot to see the actual data values 
+```{r box_ex,eval=TRUE}
+ggplot(mpg, aes(class, hwy))+
+  geom_boxplot(outlier.colour = "red", outlier.shape = 1)+
+  geom_jitter(alpha=0.5)
+
+ggplot(mpg, aes(class, hwy))+
+  geom_boxplot(outlier.colour = NULL)+
+  geom_jitter(alpha=0.5)
+
+```
+
+
+#Scale
+
+
+To the code below add a unique fill to each bar using viridis
+
+```{r barchart_scale}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+ 
+
+
+```
+
+Add a fill using colorbrewer, experiment with the `type` and `palette`:
+
+```{r plot_colorbrewer}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")
+ 
+
+
+```
+
+##Themes
+
+Move the legend position
+
+```{r barchart}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  theme(legend.position="top")
+
+
+
+```
+
+
+Alter the code below to move the legend to the bottom of the plot:
+
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  
+
+
+```
+
+Alter the plot below to have cleaner labels and a title
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  labs(x="Fire Type", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia")
+  theme(legend.position = "bottom")
+  
+
+
+```
+
+
+Alter the code below to include a subtitle containing the years represented in the data
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  labs(x="Fire Type", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia")
+  theme(legend.position = "bottom")
+  
+
+
+```
+
+Alter the code below so that Fire Type is on the y-axis:
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes())+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  labs(x="Fire Type", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia")
+  theme(legend.position = "bottom")
+  
+
+
+```
+
+The *duplicate* in FIRE_TYPE should probably be removed:
+
+```{r remove dup}
+wildfire_table<-wildfire_table%>%filter(!FIRE_TYPE=="Duplicate")
+
+
+```
+
+
+`coord_flip()` can also be used:
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes(x=FIRE_CAUSE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  labs(x="Fire Type", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia")+
+  coord_flip()+
+  theme(legend.position = "bottom")
+  
+
+
+```
+
+
+
+#Over time
+
+```{r time,echo=TRUE}
+yearly_counts <- wildfire_table %>%group_by(IGN_DATE)%>%count()%>%
+  ggplot()+
+  geom_line(aes(x=IGN_DATE,y=n))
+yearly_counts
+```
+
+Let's look at a year of data
+
+```{r wildfires2018}
+wild_2018<-wildfire_table%>%filter(FIRE_YEAR==2018)
+
+wild_2018%>%
+  group_by(IGN_DATE)%>%
+  count()%>%
+  ggplot(aes(x=IGN_DATE,y=n))+
+  geom_point()+
+  geom_line()
+```
+
+From this plot we can see that although FIRE_YEAR is 2018, there are ignition dates in 2017 and 2019.
+
+```{r ignitions}
+wild_2018 %>%filter(year(IGN_DATE) < 2018)
+
+wildfire_table %>% filter(IGN_DATE>20190101 & FIRE_YEAR==2018)
+
+wildfire_table %>% filter(OBJECTID %in% c(4537463:4537467))
+wildfire_table %>%filter(OBJECTID %in% c(4537134:4537138))
+```
+
+We are going to change these dates into 2018 and add them to our counts to plot. In the above code, I examined the unique id a database assigns, which is typically in order of when it is added. Here, I am making the assumption that since they were added together and other fields like FIRE_LABEL contain "2018" as a date, that IGN_DATE can be changed to 2018. 
+
+```{r fixdates}
+year(wild_2018$IGN_DATE)=2018
+wild_2018 %>%filter(year(IGN_DATE) < 2018)
+
+wild_2018%>%
+  group_by(IGN_DATE)%>%
+  count()%>%
+  ggplot(aes(x=IGN_DATE,y=n))+
+  geom_point()+
+  geom_line()
+```
+
+
+Alter the code below to show only the months on the x-axis
+
+```{r month2018}
+
+wild_2018%>%
+  group_by(IGN_DATE)%>%
+  count()%>%
+  ggplot(aes(x=IGN_DATE,y=n))+
+  geom_point()+
+  geom_line()
+```
+
+
+If you use `month` it will convert months into a numeric. For our purposes we want the full name
+
+```{r line month}
+wild_2018%>%
+  group_by(IGN_DATE)%>%
+  count()%>%
+  ggplot(aes(x=month(IGN_DATE,label=TRUE,abbr = FALSE),y=n))+
+  geom_point()+
+  geom_line()
+
+```
+
+Since we summarized by date, there are multiple points on this graph. A cleaner way would be:
+
+```{r line month}
+wild_2018%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_MONTH)%>%
+  count()%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_point()+
+  geom_line()
+
+```
+
+We had to add a grouping parameter so that ggplot knows that we want to group the data we've mapped for both line and points. 
+
+##As a bar
+
+Alter the labels below so they are rotated 45 degrees
+
+```{r bar month}
+wild_2018%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_MONTH)%>%
+  count()%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_col(alpha=0.8,fill="darkgreen")+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+wild_2018%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_MONTH)%>%
+  count()%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_col(alpha=0.8,fill="darkgreen")+
+  geom_text(aes(label=n), nudge_y = 20)+
+scale_x_discrete(guide = guide_axis(n.dodge = 2))
+```
+
+
+
+# Questions
+
+1. Using the mpg data set create a scatterplot of `cty` and `hwy`.
+
+2. What is the difference between `geom_col()` and `geom_bar()`?
+
+3. How would you change the labels to a 90 degree angle on the x-axis?
+
+
