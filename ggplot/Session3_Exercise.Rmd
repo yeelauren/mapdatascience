@@ -1,0 +1,242 @@
+---
+title: "Session3_exercise"
+author: "Lauren"
+date: "April 4, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(patchwork)
+```
+
+
+##Introduction to data set
+
+The data we are using is [BC Historical Wildlfires](https://catalogue.data.gov.bc.ca/dataset/fire-incident-locations-historical) from the open data catalogue.
+From their description:
+
+>Wildfire historic incident point locations for all fire seasons before the current season. Supplied through various sources. Not to be used for legal purposes. This data includes all incidents tracked by BC Wildfire Service, ie. actual fires, suspected fires, nuisance fires, smoke chases, etc. On April 1 of each year this layer is updated with the previous fire season's data.
+
+Reading in the clean data with `read_csv`. Check `?read_csv` for how to define the col_types.
+
+```{r load data}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+#library(tidyverse)
+
+wildfire_table<-readr::read_csv("./Output/wildfire_clean.csv", col_types=list("c","n","c","c","c","n","n","n","c","c","n","n","n","c","c","n"))
+```
+
+Recall this plot:
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  labs(x="Fire Cause", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia")+
+  theme(legend.position = "bottom")
+  
+
+
+```
+
+We can further alter the theme to:
+
+1. add commas to the Y-axis
+2. increase spacing between the legend and the x-axis label
+3. space out Total Entries 
+4. bolds legend title "Fire Cause"
+
+
+```{r barchart_theme}
+cause_plot=ggplot(data = wildfire_table, aes(x = FIRE_TYPE)) +
+  geom_bar(aes(fill = FIRE_CAUSE)) +
+  scale_fill_brewer(type = "qual", palette = "Dark2") +
+  labs(x = "Fire Cause",
+  y = "Total Entries",
+  fill = "Fire Cause",
+  title = "Fires Across British Columbia") +
+  scale_y_continuous(labels = scales::comma) +
+  theme(
+  legend.position = "bottom",
+  legend.title = element_text(face = "bold"),
+  legend.margin = margin(t = 15),
+  axis.title.y = element_text(margin = margin(r = 20)),
+  axis.title.x = element_text(margin = margin(t = 20))
+  )
+  
+cause_plot
+
+```
+
+
+
+Let's look at a year of data
+
+```{r wildfires2018}
+wild_2018<-wildfire_table%>%filter(FIRE_YEAR==2018)
+
+wild_month=wild_2018%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_MONTH)%>%
+  count()%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_point()+
+  geom_line()+
+  labs(x="Month",y="Number of Wildfires")+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+wild_month
+```
+
+
+Let's recreate the time series plot of wildfires over ten years by using facets with 5 rows.
+
+```{r facets}
+
+wildfire_table<-wildfire_table%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))
+
+wildfire_year<-wildfire_table%>%
+  group_by(IGN_YEAR=year(IGN_DATE),IGN_MONTH)%>%
+  summarize(n=n())%>%
+  filter(between(IGN_YEAR,2008,2017))
+
+wildfire_year%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_point()+
+  geom_line()+
+  labs(x="Month",y="Number of Wildfires")+
+  facet_wrap(nrow=5,vars(IGN_YEAR))+
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1)
+  )
+
+
+
+```
+
+
+##Patchwork
+
+Make sure you have patchwork installed `install.packages("patchwork")` and call `library(patchwork)`
+
+Let's re-create the first barchart using wild_2018 to get the fire causes for that year
+
+Then let's use patchwork to generate a plot of wild_2018 and wild_cause_2018.
+
+```{r, patchwork}
+
+wild_cause_2018<-wild_2018%>%
+  ggplot(aes(x=FIRE_CAUSE))+
+  geom_bar(fill="#5AB4AC")+
+  labs(x="Fire Cause", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia in 2018")+
+  scale_y_continuous(labels = scales::comma)+
+  theme(
+  
+    axis.title.y = element_text(
+      margin = margin(r=20)
+    ),
+    axis.title.x = element_text(
+      margin = margin(t=20)
+    )
+    )
+
+wild_cause_2018
+
+```
+
+In patchwork we can add two plots together simply by calling the variable for each plot and add them together using `+`
+
+```{r patchwork2}
+
+p=wild_cause_2018 + wild_month
+p
+
+p + plot_layout(ncol = 2, width = c(1, 2))
+
+```
+
+We can stack one of top of each other by using `/`
+
+```{r patchwork top}
+
+wild_cause_2018 /wild_month
+
+```
+
+Add plot annotation, check `?tag_levels` for other options other than A,B
+
+```{r patchwork annotation}
+
+wild_cause_2018 /wild_month + plot_annotation(tag_levels = 'A')
+
+```
+
+
+
+#Create map
+
+Using the `sf` library we will take our wildfire_table and convert the longitude and latitude values into a map. The `crs` is the coordinate reference system, typically this value will be 4326 for longitude and latitude coordinates.
+
+```{r}
+library(sf)
+
+wild_shp<-st_as_sf(wildfire_table,coords=c("LONGITUDE","LATITUDE"),crs=4326)
+wild_shp<-wild_shp %>%filter(year(IGN_DATE)==2017)
+
+```
+
+```{r, plot a map}
+
+ggplot()+
+  geom_sf(data=wild_shp)
+```
+
+Those are all the points of wildfires in BC, however we need a background to this map.
+We could download more open spatial data to build up a map or use another package in R.
+
+```{r }
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+canada <- ne_countries(country="Canada",scale = "medium", returnclass = "sf")
+
+ggplot(data=canada)+
+  geom_sf()+
+  geom_sf(data=wild_shp)
+```
+
+We should zoom in further to see the province by altering the **coordinate_system**
+
+```{r maps}
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+canada <- ne_countries(country="Canada",scale = "medium", returnclass = "sf")
+
+ggplot(data=canada)+
+  geom_sf()+
+  geom_sf(data=wild_shp)+
+  coord_sf(xlim=c(-133.62,-114),ylim=c(48,60.04))
+```
+
+
+Add some transparency and show by FIRE_CAUSE
+```{r maps theme}
+ggplot(data=canada)+
+  geom_sf()+
+  geom_sf(data=wild_shp, aes(colour=FIRE_CAUSE),alpha=0.3)+
+  scale_colour_viridis_d()+
+  labs(colour="Fire Cause")+
+  coord_sf(xlim=c(-133.62,-114),ylim=c(48,60.04))+
+  theme(panel.grid.major = element_line(color = gray(0.5), linetype = "dashed", 
+        size = 0.5), panel.background = element_rect(fill = "aliceblue"))
+
+```
+

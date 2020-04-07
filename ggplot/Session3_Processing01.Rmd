@@ -1,0 +1,84 @@
+---
+title: "Session3_exercise"
+author: "Lauren"
+date: "April 4, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+```{r load data}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+#library(tidyverse)
+
+wildfire_table<-readxl::read_excel("./Data/wildfires_table.xlsx", col_types=c("text","numeric","text","text","text","numeric","numeric","numeric","text","text","numeric","numeric","numeric","text","text","numeric"))
+```
+
+
+
+```{r reformat date}
+wildfire_table<-wildfire_table %>%
+    mutate(IGN_DATE = parse_date_time(IGN_DATE,"ymd"))
+
+```
+
+Uh-oh, our other field `FIREYEAR` has a minimum of 1950. What about dates that didn't match our format? We can investigate this further by:
+
+```{r fix date}
+
+wildfire_table %>% filter(year(IGN_DATE)==1930)
+
+wildfire_table %>%filter(is.na(IGN_DATE))
+
+wildfire_table<-wildfire_table%>%filter(!year(IGN_DATE)==1930)
+
+```
+
+
+The *duplicate* in FIRE_TYPE should probably be removed:
+
+```{r remove dup}
+wildfire_table<-wildfire_table%>%filter(!FIRE_TYPE=="Duplicate")
+
+
+```
+
+
+
+#Output Data
+
+In the chunk below we are going to export two new wildfire data sets for different years to use in the Markdown_Report.Rmd. The first subset of data will be from the year 2016 and the second from 2017. We are going to output these into the `Output` folder in your working directory/project folder. Create this folder if it doesn't exist.
+
+Additionally, we are going to output ALL the data into a new csv as "wildfire_clean.csv" so we are dealing with only the data that we have cleaned from above.
+
+```{r outputclean}
+
+write_csv(wildfire_table,"./Output/wildfire_clean.csv")
+
+```
+
+```{r output1}
+
+output1<- wildfire_table %>%filter(year(IGN_DATE)==2016)
+
+write_csv(output1,"./Output/wildfire_2016.csv")
+
+
+```
+
+
+Using the example above to guide you, generate the outputs for 2017.
+
+```{r output2}
+write_csv()
+
+```
+
+
+

@@ -1,0 +1,85 @@
+---
+title: "Markdown_Report"
+author: "Lauren"
+date: "April 4, 2020"
+output: word_document
+params:
+  file_path: "./Output/wildfire_2016.csv"
+  year: 2016
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r load data}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(knitr)
+#library(tidyverse)
+
+wildfire_table<-readr::read_csv(params$file_path, col_types=list("c","n","c","c","c","n","n","n","c","c","n","n","n","c","c","n"))
+```
+
+
+The main fields we will be focusing on are `FIRE_TYPE`,`FIRE_CAUSE`,`FIRE_YEAR `,`CURRENT_SIZE`, and `IGNITION_DATE`
+
+FIRE_CAUSE is the suspected cause of the fire, e.g., Lightning, Person.
+
+FIRE_TYPE defines the type of incident that occurred, e.g., Fire of Note, New, Modified/Monitored, Full Response.
+
+FIRE_YEAR represents the fiscal year, April 1 to March 31.
+
+IGNITION_DATE is the discovery date of the fire.
+
+CURRENT_SIZE is the estimated size of the area within the outside perimeter of the incident, in hectares.
+
+
+##Exploratory Analysis of Wildfires
+
+Let's set out to investigate these questions first:
+
+1) How many entries of fires do we have for a given year?
+
+2) What is the average,minimum and maximum `SIZE_HA` that we have for our data?
+
+3) What is the count of fires in a year?
+
+
+
+```{r exploratory analysis}
+wild_sum<-wildfire_table%>%summarize(average=mean(SIZE_HA,na.rm=T),min=min(SIZE_HA,na.rm=T),max=max(SIZE_HA,na.rm=T))
+
+knitr::kable(wild_sum, format.args=list(big.mark=","))
+```
+
+There were `r nrow(wildfire_table)` fires over the time period from `r min(wildfire_table$IGN_DATE)` and `r max(wildfire_table$IGN_DATE)` 
+
+```{r bar month}
+wildfire_table%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_MONTH)%>%
+  count()%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_col(alpha=0.8,fill="darkgreen")+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+
+```{r barchart_theme}
+ggplot(data=wildfire_table, aes(x=FIRE_TYPE))+
+  scale_fill_brewer(type="qual",palette = "Dark2")+
+  geom_bar(aes(fill=FIRE_CAUSE))+
+  labs(x="Fire Type", y="Total Entries",fill="Fire Cause",title = "Fires Across British Columbia")+
+  coord_flip()+
+  theme(legend.position = "bottom")
+  
+
+
+```
+
+

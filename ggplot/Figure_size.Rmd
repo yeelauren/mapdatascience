@@ -1,0 +1,42 @@
+---
+title: "Figure_Sizing"
+author: "Lauren"
+date: "April 4, 2020"
+output: 
+  word_document:
+  fig_width: 6
+  fig_height: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.path="Sizing/")
+library(ggplot2)
+```
+
+
+In R Markdown you can specify the figure size globally, in the YAML header or per chunk.
+If you assign the figure size globally then these settings will be applied by default to
+every chunk.
+
+Example of YAML header:
+output:
+  word_document:
+    fig.width: 6
+    fig.height: 4
+
+Or we can assign this per chunk
+
+```{r figsizing6x4}
+ggplot(data=mpg)+
+  geom_point(aes(x=displ,y=hwy))
+
+```
+
+We can overide the YAML header by specifying figure height and width in each chunk
+
+```{r figsizing2x1, fig.width=2,fig.height=1}
+ggplot(data=mpg)+
+  geom_point(aes(x=displ,y=hwy))
+
+```
