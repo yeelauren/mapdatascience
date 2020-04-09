@@ -1,0 +1,248 @@
+---
+title: "Session4_Exercise"
+author: "Lauren"
+date: "April 8, 2020"
+output: 
+  html_document:
+    theme: cosmo
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(plotly)
+library(leaflet)
+#install.packages("DT")
+library(DT)
+library(gganimate)
+```
+
+
+```{r load data}
+
+wildfire_table<-readr::read_csv("./Output/wildfire_clean.csv", col_types=list("c","n","c","c","c","n","n","n","c","c","n","n","n","c","c","n"))
+```
+
+
+We're taking our chart from last session and making it interactive. We can do this simply by using `ggplotly` and our plot.
+
+# Fires in British Columbia {.tabset}
+
+## First plotly
+
+```{r barchart_theme}
+cause_plot=ggplot(data = wildfire_table, aes(x = FIRE_TYPE)) +
+  geom_bar(aes(fill = FIRE_CAUSE)) +
+  scale_fill_brewer(type = "qual", palette = "Dark2") +
+  labs(x = "Fire Cause",
+  y = "Total Entries",
+  fill = "Fire Cause",
+  title = "Fires Across British Columbia") +
+  scale_y_continuous(labels = scales::comma) +
+  theme(
+  legend.position = "bottom",
+  legend.title = element_text(face = "bold"),
+  legend.margin = margin(t = 15),
+  axis.title.y = element_text(margin = margin(r = 20)),
+  axis.title.x = element_text(margin = margin(t = 20))
+  )
+  
+
+
+fig<-ggplotly(cause_plot)
+fig
+```
+
+## Tool tips
+
+Specify text in the tool tip:
+`\n` is a hack to get a new line in the tooltip
+
+```{r tooltip}
+cause_plot=ggplot(data = wildfire_table, aes(x = FIRE_TYPE, text=
+                                               paste0("Fire Type:", FIRE_TYPE, "\n","Fire Cause:",FIRE_CAUSE,"\n"))) +
+  geom_bar(aes(fill = FIRE_CAUSE)) +
+  scale_fill_brewer(type = "qual", palette = "Dark2") +
+  labs(x = "Fire Cause",
+  y = "Total Entries",
+  fill = "Fire Cause",
+  title = "Fires Across British Columbia") +
+  scale_y_continuous(labels = scales::comma) +
+  theme(
+  legend.position = "bottom",
+  legend.title = element_text(face = "bold"),
+  legend.margin = margin(t = 15),
+  axis.title.y = element_text(margin = margin(r = 20)),
+  axis.title.x = element_text(margin = margin(t = 20))
+  )
+  
+
+
+fig<-ggplotly(cause_plot, tooltip = "text")
+fig
+
+```
+
+Specify the interaction and what happens with `dragmode = "pan"`
+
+# Wildfires in 2018 {.tabset}
+
+## Wildfires by Month
+
+```{r wildfires2018}
+wild_2018<-wildfire_table%>%filter(FIRE_YEAR==2018)
+
+wild_month=wild_2018%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_MONTH)%>%
+  count()%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_point()+
+  geom_line()+
+  labs(x="Month",y="Number of Wildfires")+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+fig=ggplotly(wild_month)%>% layout(dragmode = "pan")
+
+fig
+
+```
+
+```{r data table}
+
+wild_2018_sub<-wild_2018%>%select(IGN_DATE,FIRE_CAUSE,FIRE_TYPE,SIZE_HA)
+datatable(wild_2018_sub, options = list(pageLength = 5), colnames = c("Ignition Date", "Fire Cause","Fire Type","Size (ha)"),filter="top")
+
+```
+
+## Daily Wild Fires 
+
+```{r lines}
+daily =  wildfire_table%>%
+  filter(between(year(IGN_DATE), 2017,2018))%>%
+  group_by(IGN_DATE=as_date(IGN_DATE))%>%
+  count()%>%
+  ggplot(aes(x=IGN_DATE,y=n,group=1))+
+  geom_point()+
+  geom_line()+
+  labs(x="Date",y="Number of Wildfires")+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+ggplotly(daily, dynamicTicks = TRUE) %>%
+  rangeslider() %>%
+  layout(hovermode = "x")
+
+```
+
+Animation
+
+```{r monthly_data}
+
+monthly_data = 
+  wildfire_table%>%
+  filter(between(year(IGN_DATE), 2017,2018))%>%
+  mutate(IGN_YEAR=year(IGN_DATE),IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))%>%
+  group_by(IGN_YEAR,IGN_MONTH)%>%
+  count()
+```
+
+```{r,gganimate}
+monthly_plot = 
+  ggplot(data=monthly_data,aes(x=IGN_MONTH,y=n,group=1))+
+  geom_col(fill="#54278f",alpha=0.4)+
+  labs(x="Date",y="Number of Wildfires")+
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+monthly_plot +
+  ggtitle("Year: {frame_time}")+
+   transition_time(as.integer(IGN_YEAR))+
+  ease_aes('linear')
+  
+
+```
+
+```{r lines2}
+rshp_monthly<-monthly_data %>%
+  pivot_wider(names_from=IGN_YEAR, values_from = n,names_prefix="Y_")%>%
+  ungroup()
+rshp_monthly$Y_2018[2]=0
+plotly_figure<-plot_ly(data = rshp_monthly, x = ~IGN_MONTH)%>%
+  add_trace(y=~Y_2017,name = '2017',type='scatter',mode='lines+markers')%>%
+  add_trace(y=~Y_2018,name = '2018',type='scatter', mode = 'lines+markers')
+plotly_figure
+
+```
+
+
+## Facets
+
+```{r facets}
+
+wildfire_table<-wildfire_table%>%
+  mutate(IGN_MONTH=month(IGN_DATE,label=TRUE,abbr = FALSE))
+
+wildfire_year<-wildfire_table%>%
+  group_by(IGN_YEAR=year(IGN_DATE),IGN_MONTH)%>%
+  summarize(n=n())%>%
+  filter(between(IGN_YEAR,2008,2017))
+
+facet_plot<-wildfire_year%>%
+  ggplot(aes(x=IGN_MONTH,y=n,group=1))+
+  geom_point()+
+  geom_line()+
+  labs(x="Month",y="Number of Wildfires")+
+  facet_wrap(nrow=5,vars(IGN_YEAR))+
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1)
+  )
+
+ggplotly(facet_plot)
+
+```
+
+
+
+# Leaflet
+
+```{r spatial data}
+library(sf)
+
+wild_shp<-st_as_sf(wildfire_table,coords=c("LONGITUDE","LATITUDE"),crs=4326)
+wild_shp<-wild_shp %>%filter(year(IGN_DATE)==2017)
+
+```
+
+```{r leaflet}
+library(leaflet)
+leaflet(wild_shp) %>%
+  #setView(174.764, -36.877, zoom = 16) %>%
+  addTiles()%>%
+  addMarkers(clusterOptions = markerClusterOptions())
+
+
+pal <- colorFactor(c("navy", "red","grey"), domain = c("Person", "Lightning","Unknown"))
+
+leaflet(wild_shp) %>% 
+  addTiles() %>%
+  addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite")%>%
+   addLayersControl(
+    baseGroups = c("OSM", "Toner", "Toner Lite"))%>%
+  addCircleMarkers(
+    radius = ~sqrt((SIZE_HA/10000)/pi),
+    color = ~pal(FIRE_CAUSE),
+    stroke = FALSE, fillOpacity = 0.5,
+    popup= ~paste(sep = "<br/>",FIRE_CAUSE, "Size:",SIZE_HA," ha")
+  )
+```
+
+
+
