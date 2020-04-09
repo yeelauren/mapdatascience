@@ -19,3 +19,7 @@ Method 2:
 Go to : [https://github.com/GISKid/mapdatascience/tree/master/ggplot](https://github.com/GISKid/mapdatascience/tree/master/ggplot)
 
 And select "Download as zip" to download the files in ggplot2 for this course
+
+Shiny Apps of Interest:
+
+[https://alhill.shinyapps.io/COVID19seir/](Modelling COVID-19 Spread vs Healthcare Capacity)
