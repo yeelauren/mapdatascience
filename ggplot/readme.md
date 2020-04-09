@@ -6,7 +6,7 @@ Session 2 : [Session 2 Presentation](http://www.mapdatascience.com/ggplot/Sessio
 
 Session 3 : [Session 3 Presentation](http://www.mapdatascience.com/ggplot/Session3_pres.html)
 
-Session 4 : [Session 3 Presentation](http://www.mapdatascience.com/ggplot/Session3_pres.html)
+Session 4 : [Session 4 Presentation](http://www.mapdatascience.com/ggplot/Session4_pres.html)
 
 Download Exercises:
 
