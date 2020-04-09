@@ -22,4 +22,4 @@ And select "Download as zip" to download the files in ggplot2 for this course
 
 Shiny Apps of Interest:
 
-[https://alhill.shinyapps.io/COVID19seir/](Modelling COVID-19 Spread vs Healthcare Capacity)
+[Modelling COVID-19 Spread vs Healthcare Capacity](https://alhill.shinyapps.io/COVID19seir/)
