@@ -1,8 +1,15 @@
 ## Welcome to Data Management and Data Cleaning in R
 
+We will be using R Studio, to download R:
+
+https://rstudio.com/products/rstudio/download/#download
+
+Select the version of R Studio for your computer (e.g. Mac, Windows, Linux).
+
+Once the set-up is complete, run `install.packages(c('tidyverse','ggplot2')`
+
+
 Presentations for sessions can be viewed here and downloaded from your browser: 
-
-
 
 Session 1 : [Session 1 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_1.html)
 
