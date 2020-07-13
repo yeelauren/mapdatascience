@@ -1,0 +1,189 @@
+---
+title: "Session1_Titanic_Follow_along"
+author: "Lauren Yee"
+date: "13/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+#Example Data
+
+##Titanic Data Set
+
+```{r read, echo=FALSE, warning=FALSE, message=FALSE}
+titanic<-read_csv("./Raw Data/titanic.csv")
+
+```
+
+
+```{r DT, echo=FALSE,out.width="50%",fig.align='center'}
+
+knitr::kable(head(titanic),'html')
+
+```
+
+
+## `filter` to select a subset of rows
+
+## passengers who were 35 years old
+
+```{r, echo=TRUE, out.width="75%"}
+titanic %>%
+  filter(Age == 35) #<<
+```
+
+## `filter` for many conditions at once
+
+## Age is 35 and Sex is female
+
+```{r, echo=TRUE, out.width="75%"}
+titanic %>%
+  filter(Age == 35, Sex=="female")#<<
+```
+]
+
+
+
+operator    | definition                   || operator     | definition
+------------|------------------------------||--------------|----------------
+`<`         | less than                    ||`x`&nbsp;&#124;&nbsp;`y`     | `x` OR `y` 
+`<=`        |	less than or equal to        ||`is.na(x)`    | test if `x` is `NA`
+`>`         | greater than                 ||`!is.na(x)`   | test if `x` is not `NA`
+`>=`        |	greater than or equal to     ||`x %in% y`    | test if `x` is in `y`
+`==`        |	exactly equal to             ||`!(x %in% y)` | test if `x` is not in `y`
+`!=`        |	not equal to                 ||`!x`          | not `x`
+`x & y`     | `x` AND `y`                  ||              |
+
+
+
+## `select` to keep variables
+
+
+
+```{r, echo=TRUE}
+titanic %>%
+  filter(Age == 35, Sex=="female")%>%
+  select(Name, Sex, Age, Fare)#<<
+```
+
+
+## `select` to exclude variables
+
+```{r, echo=TRUE}
+titanic %>%
+  select(-Embarked)
+```
+
+
+## `select` a range of variables
+
+
+```{r, echo=TRUE}
+titanic %>%
+  select(PassengerId:Name)
+```
+
+
+## `slice` for certain row numbers
+
+##First five
+```{r, echo=TRUE}
+titanic %>%
+  slice(1:5)
+```
+
+
+## `slice` for certain row numbers
+
+##Last five
+```{r, echo=TRUE}
+last_row <- nrow(titanic)
+titanic %>%
+  slice((last_row - 4):last_row)
+```
+
+
+## `pull` to extract a column as a vector
+
+```{r, echo=TRUE}
+titanic %>%
+  slice(1:6) %>%
+  pull(Fare)
+```
+
+##vs.
+
+```{r, echo=TRUE}
+titanic %>%
+  slice(1:6) %>%
+  select(Fare)
+```
+
+
+
+## `sample_n` / `sample_frac` for a random sample
+
+## - `sample_n`: randomly sample 5 observations
+
+```{r, echo=TRUE}
+titanic_n5 <- titanic %>%
+  sample_n(5, replace = FALSE)
+dim(titanic_n5)
+```
+
+## - `sample_frac`: randomly sample 20% of observations
+
+```{r, echo=TRUE}
+titanic_perc20 <-titanic %>%
+  sample_frac(0.2, replace = FALSE)
+dim(titanic_perc20)
+```
+
+---
+class: bg-main3 black
+
+## `distinct` to filter for unique rows
+
+##And `arrange` to order alphabetically
+
+```{r, echo=TRUE}
+titanic %>% 
+  select(Pclass, Fare) %>% 
+  distinct() %>% 
+  arrange(Fare, Pclass)
+```
+
+
+
+## `summarise` to reduce variables to values
+
+```{r, echo=TRUE}
+titanic %>%
+  summarise(avg_fare = mean(Fare,na.rm=T))
+```
+
+
+## `group_by` to do calculations on groups
+
+```{r, echo=TRUE}
+titanic %>%
+  group_by(Sex) %>%
+  summarize(avg_fare = mean(Fare,na.rm=T))
+```
+
+
+## `count` observations in groups
+
+```{r, echo=TRUE}
+titanic %>%
+  count(Sex)
+```
+
+```{r, echo=TRUE}
+titanic %>%
+  count(Survived)
+```

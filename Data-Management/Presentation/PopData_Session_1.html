@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>PopData_Session_1.utf8</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <link rel="stylesheet" href="style-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: middle center bg-main1
+
+
+#Data Management in R 
+##Session 1
+###July 14 th, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+&lt;/div&gt;
+
+---
+
+class: bg-indigo
+
+.row[.img-right[
+    ![](./laur.png)
+    ]
+    ]
+   .row[.text-left[
+    
+    ###**Lauren Yee** is multifaceted researcher and data scientist. She currently works in the consulting industry and designs projects around data visualization, dashboards and ecological, spatial analysis, studied emerging infectious zoonoses and spatial epidemiology.
+
+]
+]
+
+.row[.img-right[
+      ![](./Ann.png)
+      ]
+    ]
+.row[.content.text-left[
+   ###**Ann Greenwood** is the Education and Training Lead for Population Data BC. She  manages a variety of education and training services for researchers and population health professionals . Services  include an online certificate course in Population Health Data Analysis, live webinar-based courses, free online  self -paced workshops, colloquium presentations/webinars  and in-person workshops.
+   ]
+]
+
+---
+
+class: middle center bg-deep-purple
+
+#Data Management 
+
+---
+
+class: split-two 
+
+.column.bg-deep-purple[.content[
+## Data in the real world
+
+ ###- Often not what you expect
+ 
+ ###- There can be significant .green[time delays] to getting the data you need that cut into analysis time
+ 
+ ###- Staff turn-over from the data providers can make it difficult to get questions answered 
+ 
+ ###- Can be hard to access or gain access to data that exists and you need
+ 
+ ###- Often little to no documentation about what variables mean, how it was collected, or what may have changed during the data collection period
+ 
+ ###Data documentation is important for assessing .green[data quality] and .green[reliability].
+ 
+   .bottom_abs.font_small[
+  https://www.poverty-action.org/sites/default/files/publications/Goldilocks-Deep-Dive-Using-Administrative-Data-for-Monitoring-and-Evaluation_0.pdf
+
+  https://www150.statcan.gc.ca/n1/pub/12-539-x/2009001/administrative-administratives-eng.htm
+  
+  https://www.statcan.gc.ca/eng/about/admin_data_faq
+  ]
+
+
+]]
+
+.column.bg-deep-purple[.content[
+
+
+
+###Ideally the documentation will: provide concise and clear explanation of the datasets, including variable definitions and value codes; review survey instruments or collection forms and collection protocols
+  
+  
+### Once you have reviewed data documentation, plan to reach out to several people in different departments with questions and for clarifications. Administrative data may come from large and complex systems, and often .yellow[no single person] understands them all. Even when a description seems clear to you, it may mean something entirely different to the person who wrote it.
+
+]]  
+---
+
+class: split-two white
+
+.column.bg-deep-purple[.content[
+  # <span>&lt;i class="fas  fa-hospital faa-flash animated-hover " style=" color:white;"&gt;&lt;/i&gt;</span> Administrative Data 
+  .middle[
+  ###Data that is collected or created by an agency (government, private sector) for their own purposes, typically used to track a program's implementation, project activities and expenses, indicators for a program outcome or to comply with government reporting regulations. 
+  
+  ###Examples include: hospital records of patient visits and health outcomes, drug benefit claims, surveillance programs,educational records, financial institutions
+  ]
+  
+ 
+  
+ ]]
+.column.bg-main2[.content[
+
+## Benefits: 
+  
+  ###- lower the collection costs relative to administering your own survey and supply you with good data
+  ###- large collection of longitudinal data
+
+ ## Limitations :
+  
+   ### - possible lack of accuracy
+   ### - different coding criteria across individuals and institutions
+   ###- changing criteria over time
+   ### - changing in coding system over time
+   ### - difficulties in linkage and merging of different databases
+   ### - difficult to obtain or practice on
+
+
+  
+]]
+---
+class: split-two white
+
+.column.bg-deep-purple[.content[
+  # <span>&lt;i class="fas  fa-hospital faa-flash animated-hover " style=" color:white;"&gt;&lt;/i&gt;</span> Administrative Data 
+  ###Consider asking the data producer about how the data was collected (data entry and standards), and if it is suitable for your analysis/hypothesis.
+  
+  ###Why the data was created in the first place (legislation, objectives, needs of the organization, end-use of the data) ? 
+ 
+ 
+   ]]
+  
+  .column.bg-main2[.content.vmiddle[
+  ###Consider the .yellow[time period] for any subject being studied (e.g., a person, a family, a child care program) is limited by the period of time that the subject is using the service for which the data are being collected
+
+### Can the data be .yellow[supplemented] ?
+
+### Health care administrative data can be supplemented through linkages with other data sources such as census data to estimate neighbourhood income, clinical registries, electronic medical records, citizenship data or survey data to add to patient perspectives and lifestyle variables.
+] 
+
+  .bottom_abs.font_small[https://bmchealthservres.biomedcentral.com/articles/10.1186/s12913-016-1489-0]
+  ]
+  
+ 
+---
+
+class: middle center bg-deep-purple
+
+# Making your R work .yellow[organized] and .yellow[portable]
+
+.blockquote[
+##One day you will need to quit R, go do something else and return to your analysis later.&lt;/br&gt;&lt;/br&gt;
+##One day you will have multiple analyses going that use R and you want to keep them separate.&lt;/br&gt;&lt;/br&gt;
+##Perhaps there is a global pandemic and you have to switch workstations to a home office
+##Use R to organize all your projects, data, data cleaning scripts, visualization scripts, model scripts, image and data outputs.
+]
+ 
+
+
+---
+class: split-two bg-deep-purple
+
+.column[.content[#Pseudocode
+## 1. The process of writing out "what you want to do" in common terms 
+## 2. Then adapting your written words into R code
+
+.blockquote[
+Load Data into R
+
+Run summary statistics
+
+Remove NA values
+
+Plot Values
+]
+
+]
+]
+.column[.content.center.middle[
+
+&lt;br&gt;
+##This allows you to form a .yellow[roadmap] for your analysis and troubleshoot along the way
+
+##Helps with mental fatigue when troubleshooting for hours 
+##What was I doing? What was I trying to do? What is the next step?
+
+##Refer back to your .green[pseudocode!]
+
+
+]]
+
+---
+
+class: middle center bg-green
+
+#Workflow
+
+---
+class: bg-green
+
+#Workflow
+
+### 1. Examine the data, data dictionaries, documentation and realistically...long long email threads about the data
+### 2. Set up your project in R
+### 3. Use R Markdown as a .yellow[living document] or .yellow[data dictionary]
+### 4. Exploratory Data Analysis
+### 5. Generate data cleaning scripts and basic statistics (does this align with expected results from step 1? )
+### 6. Separate clean data, reduced data into separate folder structures 
+### 7. Repeat steps above as necessary
+### 8. Functionalize any repeating code or handy scripts you will use often, create loops for automated data processing
+### 9. Generate final reports, visualizations as R Markdown to be shared
+
+
+---
+
+class: bg-main2 
+
+#Before working with data...
+#Before opening starting an analysis...
+
+## Ask all the questions about that data!
+## Read the documentation
+## Make note of contacts for the data
+## Make a plan and approach for analysis, ask for feedback from peers or superiors 
+## Expect to rewrite, abandon or rework your R code many times
+## Data management is easier in R with new technologies that are being developed every day...
+
+---
+
+class: middle center bg-deep-purple
+
+#Data Quality
+
+## Never assume you have good data
+## What Data quality controls were employed during data collection?
+## Specific data quality standards exist see the International Organization for Standardization (ISO): https://www.iso.org/obp/ui/#iso:std:iso:8000:-61:ed-1:v1:en
+###....but are often not universally followed by data producers
+
+
+---
+
+class: middle center bg-deep-purple
+
+#Prepare to:
+.blockquote[
+### Check for completeness of data, duplicates, duplicate unique ids
+### Maximum, minimum values
+### Logic checks (Is age negative or over 100?)
+### Recode variables
+### Are dollar values in the current year?
+]
+
+## Develop code to .yellow[reuse] in your analysis to check for data quality
+## This will save you time, money and frustration
+
+---
+
+
+class: split-two bg-main-1
+
+.column.bg-main1[.content[
+# <span>&lt;i class="fas  fa-exclamation-triangle faa-flash animated " style=" color:red;"&gt;&lt;/i&gt;</span> Do you use `getwd()` and `setwd()` ?
+# .yellow[Don't!] there are better ways
+
+## Setting the directory .green[limits] reproducibility 
+
+&lt;img src = './Figures/rstudio-project-1.png'&gt;
+
+]]
+
+
+.column.bg-main2[.content[
+  # Use **Projects**!
+  
+  R uses a "working directory" which is where R will first look for files that you want it to load and where it will save.
+A recommended structure for R projects is as follows:
+
+-  Set up a directory for the project/analysis. Inside this folder create a "Workspace". 
+
+- Inside your workspace create two folders, Data and Outputs. Data for where you will be loading raw data from and outputs for saving.
+
+A great tool in R is to "Create a New Project", which will then be mapped to your "Workspace".
+This is similar to use `setwd()` in R, however all projects by default are mapped to the folder it is saved in. 
+
+- All references can be relative`"./Data/"` rather than absolute paths `"C:/Desktop/Projects/ABC/Data/"`
+
+See also: https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects
+]]
+---
+class: bg-main2 
+
+.content[
+#Paths
+
+##Paths and directories can differ between Mac/Linux and Windows. There are three chief ways in which they differ:
+
+###The most important difference is how you separate the components of the path. Mac and Linux uses slashes (e.g. plots/diamonds.pdf) and Windows uses backslashes (e.g. plots\diamonds.pdf). R can work with either type (no matter what platform you’re currently using)
+
+###.green[Absolute paths] (i.e. paths that point to the same place regardless of your working directory) look different. In Windows they start with a drive letter (e.g. C:) or two backslashes (e.g. `\\servername`) and in Mac/Linux they start with a slash “/” (e.g. /users/hadley). 
+
+###You should never use absolute paths in your scripts, because they hinder sharing e.g. the user hadley above may be your username
+
+###The place that `~` points to. `~` is a convenient shortcut to your home directory. Windows doesn’t really a home directory, so it points to your documents directory.
+]
+
+
+---
+class: bg-main2 
+
+
+.content[
+#Informative file names
+
+##Object names must start with a letter, and can only contain letters, numbers, .codeblock`_` and `.` 
+##You want your object names to be descriptive, so you’ll need a convention for multiple words. I recommend snake_case where you separate lowercase words with `_`
+
+.blockquote.black[
+i_use_snake_case
+
+otherPeopleUseCamelCase
+
+some.people.use.periods
+
+And_aFew.People_RENOUNCEconvention
+]
+]
+
+
+---
+class: bg-main2 black 
+
+.content[
+#RStudio projects give you a solid workflow that will serve you well in the future:
+
+.center[
+   ### Create an RStudio project for each data analysis project.
+
+   ###  Keep data files there; we’ll talk about loading them into R in data import.
+
+   ###  Keep scripts there; edit them, run them in bits or as a whole.
+
+   ### Save your outputs (plots and cleaned data) there.
+
+   ###  Only ever use relative paths, not absolute paths.
+   ]
+
+##Everything you need is in one place, and cleanly separated from all the other projects that you are working on.
+]
+
+---
+
+class: bg-main1
+
+# R Markdown
+
+.font_medium[
+- *markdown* is a simplified language for text output that is commonly used to convert text to the HTML language that is meant to be easily understood.
+
+- R Markdown is an authoring format that combines the *markdown* syntax with embedded R code chunks
+
+- allows you to combine your notes, narrative, methods, code and results in one file
+
+- fully reproducible with many output formats: PDF, word, html, dashboards and slideshows
+
+- can use multiple programming languages in one document such as: R, Python, and SQL
+]
+
+---
+
+class: bg-main1
+
+# R Markdown
+--
+
+##Designed to be used in three ways:
+
+
+### 1. Communication to decision makers
+
+  - ### High level conclusions and visualizations
+
+
+--
+
+### 2. Collaboration with teams 
+
+  - ### Including code, methods and approach
+    
+--
+
+### 3. Environment to **do** data analysis 
+
+  - ### A modern day lab notebook including what you did, your code, and why you did it that way
+  
+---
+
+class: split-three white center
+
+.row.bg-main1[.content.vmiddle[
+# Use a .green[consistent] style
+]]
+.row.bg-main2[
+.split-three[
+.column[
+
+]
+.column[
+# .yellow[Do not]  .green[repeat] automate, functions, loops
+
+]
+.column[
+
+]
+]
+]
+.row.bg-main3[.content.vmiddle[
+# Use relative paths
+]]
+
+---
+
+
+class: bg-main1 center middle hide-slide-number
+
+.reveal-text.bg-main2[.pad1[
+.font4[#Tidyverse]
+]]
+
+---
+class: split-two bg-main1
+
+.column[.content[
+#What is the tidyverse?
+
+
+A collection of R packages that make it easier to work with data. 
+
+
+- `dplyr` is used to manipulate, group, and summarize data
+
+- `ggplot2` is a data visualization library that we will be using in the course!
+
+- `readr` loads data into R
+
+- `tibble` data format, similar to data frames
+
+- `purrr` functions which replace for loops with code that is both more succinct and easier to read
+
+- `tidyr` is a library meant for formatting and shaping data into the 'tidy' format...
+]
+]
+.column[
+
+  ![](./Figures/tidy_verse.png)
+
+]
+
+---
+class: split-two bg-main1
+
+.column[
+
+#Tidy Data
+
+
+###It is often said that 80% of data analysis is spent on the cleaning and preparing data.
+
+###.green[Data Tidying] : structuring datasets to facilitate analysis.
+&lt;/br&gt;
+###The goal of tidyr is to help you create tidy data. Tidy data is data where:
+
+
+.center[ 
+###- Every column is variable
+###- Every row is an observation
+###- Every cell is a single value
+]
+
+]
+.column[
+  .vmiddle[![](./Figures/tidy-1.png)
+
+###Tidy data describes a standard way of storing data that is used wherever possible throughout the tidyverse. It is an attempt to standardize data.
+
+###All `tidyverse` packages are designed to work with tidy data.
+  ]
+]  
+
+
+
+
+---
+class: bg-main1
+.content.center[
+#Workflow in the Tidyverse
+
+
+&lt;img src='https://d33wubrfki0l68.cloudfront.net/e3f9e555d0035731c04642ceb58a03fb84b98a7d/4f070/diagrams/data-science-wrangle.png'&gt;
+
+]
+
+##Import the data into R using `readr`
+## 'Tidy' the data using `dplyr` or `tidyr` 
+## Transform the data for your analysis, recode variables using `dplyr`, `purrr`, `lubridate`,`stringr`
+## Visualize `ggplot2`
+## Communicate `RMarkdown`
+
+---
+
+class: bg-main1
+
+#Workflow in the Tidyverse
+#Readr
+
+To accurately read a rectangular dataset with readr you combine two pieces: a function that parses the overall file, and a column specification. The column specification describes how each column should be converted from a character vector to the most appropriate data type, and in most cases it's not necessary because readr will guess it for you automatically. 
+
+readr supports seven file formats with seven `read_` functions:
+
+* `read_csv()`: comma separated (CSV) files
+* `read_tsv()`: tab separated files
+* `read_delim()`: general delimited files
+* `read_fwf()`: fixed width files 
+* `read_table()`: tabular files where columns are separated by white-space.
+* `read_log()`: web log files
+
+##Other Types of Data
+
+Try one of these packages to import other types of files:
+
+**haven** - SPSS, Stata, and SAS Files
+**readxl** - Excel files (.xls and .xlsx)
+**DBI** - databases
+**jsonlite** - json 
+
+
+---
+class: bg-main1
+
+## A Grammar of Data Manipulation
+
+**dplyr** is based on the concepts of functions as verbs that manipulate data frames.
+
+.pull-left[
+![](Figures/dplyr-part-of-tidyverse.png){height=25%}
+]
+.pull-right[
+.midi[
+- `filter`: pick rows matching criteria
+- `slice`: pick rows using index(es)
+- `select`: pick columns by name
+- `pull`: grab a column as a vector
+- `arrange`: reorder rows
+- `mutate`: add new variables
+- `distinct`: filter for unique rows
+- `sample_n` / `sample_frac`: randomly sample rows
+- `summarise`: reduce variables to values
+- ... (many more)
+]
+]
+
+---
+class: bg-main2 center middle hide-slide-number
+#**dplyr** rules for functions
+
+ #First argument is *always* a data frame/tibble
+ #Subsequent arguments say what to do with that data frame
+ #Always return a data frame
+
+
+---
+
+class: bg-main1 center middle hide-slide-number
+
+.reveal-text.bg-main2[.pad1[
+.font4[#Pipes %&gt;%]
+]]
+### Easier to read structure
+### "pipe" the output of the previous line of code as the first input of the next line of code.
+
+
+### The `+` operator in **ggplot2** functions is used for "layering". This means you create the plot in layers, separated by `+`.
+
+---
+
+class: bg-main3 black
+
+#Example Data
+
+##Titanic Data Set
+
+
+
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; PassengerId &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Survived &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pclass &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SibSp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Parch &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Fare &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Cabin &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Embarked &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Braund, Mr. Owen Harris &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; A/5 21171 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.2500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; S &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Cumings, Mrs. John Bradley (Florence Briggs Thayer) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PC 17599 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.2833 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; C85 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; C &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Heikkinen, Miss. Laina &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; STON/O2. 3101282 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.9250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; S &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Futrelle, Mrs. Jacques Heath (Lily May Peel) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 113803 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53.1000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; C123 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; S &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Allen, Mr. William Henry &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 373450 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.0500 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; S &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Moran, Mr. James &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 330877 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.4583 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Q &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+class: split-two bg-main3 with-thick-border border-black
+
+
+.column[
+## `filter` to select a subset of rows
+
+## passengers who were 35 years old
+
+
+```r
+titanic %&gt;%
+* filter(Age == 35)
+```
+
+```
+## # A tibble: 23 x 12
+##    PassengerId Survived Pclass Name  Sex     Age SibSp Parch Ticket   Fare Cabin
+##          &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;
+##  1           4        1      1 Futr~ fema~    35     1     0 113803  53.1  C123 
+##  2           5        0      3 Alle~ male     35     0     0 373450   8.05 &lt;NA&gt; 
+##  3          21        0      2 Fynn~ male     35     0     0 239865  26    &lt;NA&gt; 
+##  4         212        1      2 Came~ fema~    35     0     0 F.C.C~  21    &lt;NA&gt; 
+##  5         231        1      1 Harr~ fema~    35     1     0 36973   83.5  C83  
+##  6         259        1      1 Ward~ fema~    35     0     0 PC 17~ 512.   &lt;NA&gt; 
+##  7         270        1      1 Biss~ fema~    35     0     0 PC 17~ 136.   C99  
+##  8         280        1      3 Abbo~ fema~    35     1     1 C.A. ~  20.2  &lt;NA&gt; 
+##  9         364        0      3 Asim~ male     35     0     0 SOTON~   7.05 &lt;NA&gt; 
+## 10         384        1      1 Holv~ fema~    35     1     0 113789  52    &lt;NA&gt; 
+## # ... with 13 more rows, and 1 more variable: Embarked &lt;chr&gt;
+```
+]
+
+.column[
+
+## `filter` for many conditions at once
+
+## Age is 35 and Sex is female
+
+
+```r
+titanic %&gt;%
+* filter(Age == 35, Sex=="female")
+```
+
+```
+## # A tibble: 11 x 12
+##    PassengerId Survived Pclass Name  Sex     Age SibSp Parch Ticket   Fare Cabin
+##          &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;
+##  1           4        1      1 Futr~ fema~    35     1     0 113803  53.1  C123 
+##  2         212        1      2 Came~ fema~    35     0     0 F.C.C~  21    &lt;NA&gt; 
+##  3         231        1      1 Harr~ fema~    35     1     0 36973   83.5  C83  
+##  4         259        1      1 Ward~ fema~    35     0     0 PC 17~ 512.   &lt;NA&gt; 
+##  5         270        1      1 Biss~ fema~    35     0     0 PC 17~ 136.   C99  
+##  6         280        1      3 Abbo~ fema~    35     1     1 C.A. ~  20.2  &lt;NA&gt; 
+##  7         384        1      1 Holv~ fema~    35     1     0 113789  52    &lt;NA&gt; 
+##  8         487        1      1 Hoyt~ fema~    35     1     0 19943   90    C93  
+##  9         966       NA      1 Geig~ fema~    35     0     0 113503 212.   C130 
+## 10        1014       NA      1 Scha~ fema~    35     1     0 13236   57.8  C28  
+## 11        1098       NA      3 McGo~ fema~    35     0     0 9232     7.75 &lt;NA&gt; 
+## # ... with 1 more variable: Embarked &lt;chr&gt;
+```
+]
+
+---
+class: bg-main1 black
+
+# Logical operators in R
+&lt;/br&gt;
+.blockquote[
+
+
+operator    | definition                   || operator     | definition
+------------|------------------------------||--------------|----------------
+`&lt;`         | less than                    ||`x`&amp;nbsp;&amp;#124;&amp;nbsp;`y`     | `x` OR `y` 
+`&lt;=`        |	less than or equal to        ||`is.na(x)`    | test if `x` is `NA`
+`&gt;`         | greater than                 ||`!is.na(x)`   | test if `x` is not `NA`
+`&gt;=`        |	greater than or equal to     ||`x %in% y`    | test if `x` is in `y`
+`==`        |	exactly equal to             ||`!(x %in% y)` | test if `x` is not in `y`
+`!=`        |	not equal to                 ||`!x`          | not `x`
+`x &amp; y`     | `x` AND `y`                  ||              |
+
+]
+
+---
+
+class: bg-main1 black
+
+## `select` to keep variables
+
+
+
+
+```r
+titanic %&gt;%
+  filter(Age == 35, Sex=="female")%&gt;%
+* select(Name, Sex, Age, Fare)
+```
+
+```
+## # A tibble: 11 x 4
+##    Name                                                Sex      Age   Fare
+##    &lt;chr&gt;                                               &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Futrelle, Mrs. Jacques Heath (Lily May Peel)        female    35  53.1 
+##  2 Cameron, Miss. Clear Annie                          female    35  21   
+##  3 Harris, Mrs. Henry Birkhardt (Irene Wallach)        female    35  83.5 
+##  4 Ward, Miss. Anna                                    female    35 512.  
+##  5 Bissette, Miss. Amelia                              female    35 136.  
+##  6 Abbott, Mrs. Stanton (Rosa Hunt)                    female    35  20.2 
+##  7 Holverson, Mrs. Alexander Oskar (Mary Aline Towner) female    35  52   
+##  8 Hoyt, Mrs. Frederick Maxfield (Jane Anne Forby)     female    35  90   
+##  9 Geiger, Miss. Amalie                                female    35 212.  
+## 10 Schabert, Mrs. Paul (Emma Mock)                     female    35  57.8 
+## 11 McGowan, Miss. Katherine                            female    35   7.75
+```
+
+---
+class: bg-main1 black
+
+## `select` to exclude variables
+
+
+```r
+titanic %&gt;%
+  select(-Embarked)
+```
+
+```
+## # A tibble: 1,309 x 11
+##    PassengerId Survived Pclass Name   Sex     Age SibSp Parch Ticket  Fare Cabin
+##          &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;
+##  1           1        0      3 Braun~ male     22     1     0 A/5 2~  7.25 &lt;NA&gt; 
+##  2           2        1      1 Cumin~ fema~    38     1     0 PC 17~ 71.3  C85  
+##  3           3        1      3 Heikk~ fema~    26     0     0 STON/~  7.92 &lt;NA&gt; 
+##  4           4        1      1 Futre~ fema~    35     1     0 113803 53.1  C123 
+##  5           5        0      3 Allen~ male     35     0     0 373450  8.05 &lt;NA&gt; 
+##  6           6        0      3 Moran~ male     NA     0     0 330877  8.46 &lt;NA&gt; 
+##  7           7        0      1 McCar~ male     54     0     0 17463  51.9  E46  
+##  8           8        0      3 Palss~ male      2     3     1 349909 21.1  &lt;NA&gt; 
+##  9           9        1      3 Johns~ fema~    27     0     2 347742 11.1  &lt;NA&gt; 
+## 10          10        1      2 Nasse~ fema~    14     1     0 237736 30.1  &lt;NA&gt; 
+## # ... with 1,299 more rows
+```
+
+---
+class: bg-main1 black
+
+## `select` a range of variables
+
+
+
+```r
+titanic %&gt;%
+  select(PassengerId:Name)
+```
+
+```
+## # A tibble: 1,309 x 4
+##    PassengerId Survived Pclass Name                                             
+##          &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;                                            
+##  1           1        0      3 Braund, Mr. Owen Harris                          
+##  2           2        1      1 Cumings, Mrs. John Bradley (Florence Briggs Thay~
+##  3           3        1      3 Heikkinen, Miss. Laina                           
+##  4           4        1      1 Futrelle, Mrs. Jacques Heath (Lily May Peel)     
+##  5           5        0      3 Allen, Mr. William Henry                         
+##  6           6        0      3 Moran, Mr. James                                 
+##  7           7        0      1 McCarthy, Mr. Timothy J                          
+##  8           8        0      3 Palsson, Master. Gosta Leonard                   
+##  9           9        1      3 Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)
+## 10          10        1      2 Nasser, Mrs. Nicholas (Adele Achem)              
+## # ... with 1,299 more rows
+```
+
+---
+class: bg-main1 black
+## `slice` for certain row numbers
+
+##First five
+
+```r
+titanic %&gt;%
+  slice(1:5)
+```
+
+```
+## # A tibble: 5 x 12
+##   PassengerId Survived Pclass Name  Sex     Age SibSp Parch Ticket  Fare Cabin
+##         &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;
+## 1           1        0      3 Brau~ male     22     1     0 A/5 2~  7.25 &lt;NA&gt; 
+## 2           2        1      1 Cumi~ fema~    38     1     0 PC 17~ 71.3  C85  
+## 3           3        1      3 Heik~ fema~    26     0     0 STON/~  7.92 &lt;NA&gt; 
+## 4           4        1      1 Futr~ fema~    35     1     0 113803 53.1  C123 
+## 5           5        0      3 Alle~ male     35     0     0 373450  8.05 &lt;NA&gt; 
+## # ... with 1 more variable: Embarked &lt;chr&gt;
+```
+
+---
+class: bg-main1 black
+## `slice` for certain row numbers
+
+##Last five
+
+```r
+last_row &lt;- nrow(titanic)
+titanic %&gt;%
+  slice((last_row - 4):last_row)
+```
+
+```
+## # A tibble: 5 x 12
+##   PassengerId Survived Pclass Name  Sex     Age SibSp Parch Ticket   Fare Cabin
+##         &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;
+## 1        1305       NA      3 Spec~ male   NA       0     0 A.5. ~   8.05 &lt;NA&gt; 
+## 2        1306       NA      1 Oliv~ fema~  39       0     0 PC 17~ 109.   C105 
+## 3        1307       NA      3 Saet~ male   38.5     0     0 SOTON~   7.25 &lt;NA&gt; 
+## 4        1308       NA      3 Ware~ male   NA       0     0 359309   8.05 &lt;NA&gt; 
+## 5        1309       NA      3 Pete~ male   NA       1     1 2668    22.4  &lt;NA&gt; 
+## # ... with 1 more variable: Embarked &lt;chr&gt;
+```
+
+---
+class: bg-main3 black
+## `pull` to extract a column as a vector
+
+
+```r
+titanic %&gt;%
+  slice(1:6) %&gt;%
+  pull(Fare)
+```
+
+```
+## [1]  7.2500 71.2833  7.9250 53.1000  8.0500  8.4583
+```
+
+##vs.
+
+
+```r
+titanic %&gt;%
+  slice(1:6) %&gt;%
+  select(Fare)
+```
+
+```
+## # A tibble: 6 x 1
+##    Fare
+##   &lt;dbl&gt;
+## 1  7.25
+## 2 71.3 
+## 3  7.92
+## 4 53.1 
+## 5  8.05
+## 6  8.46
+```
+
+---
+class: bg-main3 black
+
+## `sample_n` / `sample_frac` for a random sample
+
+## - `sample_n`: randomly sample 5 observations
+
+
+```r
+titanic_n5 &lt;- titanic %&gt;%
+  sample_n(5, replace = FALSE)
+dim(titanic_n5)
+```
+
+```
+## [1]  5 12
+```
+
+## - `sample_frac`: randomly sample 20% of observations
+
+
+```r
+titanic_perc20 &lt;-titanic %&gt;%
+  sample_frac(0.2, replace = FALSE)
+dim(titanic_perc20)
+```
+
+```
+## [1] 262  12
+```
+
+---
+class: bg-main3 black
+
+## `distinct` to filter for unique rows
+
+##And `arrange` to order alphabetically
+
+
+```r
+titanic %&gt;% 
+  select(Pclass, Fare) %&gt;% 
+  distinct() %&gt;% 
+  arrange(Fare, Pclass)
+```
+
+```
+## # A tibble: 289 x 2
+##    Pclass  Fare
+##     &lt;dbl&gt; &lt;dbl&gt;
+##  1      1  0   
+##  2      2  0   
+##  3      3  0   
+##  4      3  3.17
+##  5      3  4.01
+##  6      1  5   
+##  7      3  6.24
+##  8      3  6.44
+##  9      3  6.45
+## 10      3  6.50
+## # ... with 279 more rows
+```
+
+---
+class: bg-main3 black
+
+## `summarise` to reduce variables to values
+
+
+```r
+titanic %&gt;%
+  summarise(avg_fare = mean(Fare,na.rm=T))
+```
+
+```
+## # A tibble: 1 x 1
+##   avg_fare
+##      &lt;dbl&gt;
+## 1     33.3
+```
+
+---
+class: bg-main3 black
+
+## `group_by` to do calculations on groups
+
+
+```r
+titanic %&gt;%
+  group_by(Sex) %&gt;%
+  summarize(avg_fare = mean(Fare,na.rm=T))
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 2 x 2
+##   Sex    avg_fare
+##   &lt;chr&gt;     &lt;dbl&gt;
+## 1 female     46.2
+## 2 male       26.2
+```
+
+---
+class: bg-main1 black
+
+## `count` observations in groups
+
+
+```r
+titanic %&gt;%
+  count(Sex)
+```
+
+```
+## # A tibble: 2 x 2
+##   Sex        n
+##   &lt;chr&gt;  &lt;int&gt;
+## 1 female   466
+## 2 male     843
+```
+
+```r
+titanic %&gt;%
+  count(Survived)
+```
+
+```
+## # A tibble: 3 x 2
+##   Survived     n
+##      &lt;dbl&gt; &lt;int&gt;
+## 1        0   549
+## 2        1   342
+## 3       NA   418
+```
+
+---
+
+class:bg-main1
+
+
+#References
+
+Portions of this material are derived from:
+
+RStudio's 'Learning Tidyverse'
+
+[Data Carpentry](http://swcarpentry.github.io) [datasciencebox.org](https://datasciencebox.org)
+
+Estrellado, R. A., Bovee, E. A., Motsipak, J., Rosenberg, J. M., &amp; Velásquez, I. C. (in press). Data science in education using R. London, England: Routledge. Nb. All authors contributed equally
+
+https://stat545.com/
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"countIncrementalSlides": false,
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
