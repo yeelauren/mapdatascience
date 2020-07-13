@@ -1,22 +1,11 @@
 ## Welcome to Data Management and Data Cleaning in R
 
+Presentations for sessions can be viewed here and downloaded from your browser: 
 
+Session 1 : [Session 1 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_1.html)
 
-Session 1 : [Session 1 Presentation](http://www.mapdatascience.com/Data-Management/Session1_pres.html)
-
-Session 2 : [Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Session2_pres.html)
-
-Session 3 : [Session 3 Presentation](http://www.mapdatascience.com/Data-Management/Session3_pres.html)
-
-Session 4 : [Session 4 Presentation](http://www.mapdatascience.com/Data-Management/Session4_pres.html)
 
 Download Exercises:
-
-Method 1:
-
-[Google Drive Exercises](https://drive.google.com/drive/folders/15PGNjfBkrCCogzpelzcwn55z84GKVR87?usp=sharing)
-
-Method 2: 
 
 Go to : [https://github.com/GISKid/mapdatascience/tree/master/Data-Management](https://github.com/GISKid/mapdatascience/tree/master/Data-Management)
 
