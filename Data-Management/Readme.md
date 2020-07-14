@@ -6,7 +6,7 @@ https://rstudio.com/products/rstudio/download/#download
 
 Select the version of R Studio for your computer (e.g. Mac, Windows, Linux).
 
-Once the set-up is complete, run `install.packages(c('tidyverse','ggplot2')`
+Once the set-up is complete, run `install.packages(c('tidyverse','ggplot2', 'rmarkdown')`
 
 
 Presentations for sessions can be viewed here and downloaded from your browser: 
