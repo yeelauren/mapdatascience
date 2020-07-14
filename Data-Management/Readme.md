@@ -26,4 +26,27 @@ Go to : [https://github.com/GISKid/mapdatascience/tree/master/Data-Management](h
 
 And select "Download as zip" to download the files in Data-Management for this course
 
-Contact: lauren@mapdatascience.com 
+**Contact**: lauren@mapdatascience.com 
+
+
+Session 1:
+
+- Brief Introduction to Administrative Data
+- Data Cleaning and Data Management
+- Data Management with R 
+- Introduction to Tidyverse
+
+Session 2:
+- Advanced Tidyverse in dplyr
+- Reshaping Data
+- Joins 
+
+Session 3:
+- Working with Dates
+- Introduction to Regex, stringr and stringi
+- R Markdown 
+
+Session 4:
+- R Markdown Continued
+- Embedding tables
+- Github version control
