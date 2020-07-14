@@ -22,6 +22,12 @@ Week 1 Practice and Follow-along:
 
 Download Exercises:
 
+Method 1:
+
+Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+Method 2: 
+
 Go to : [https://github.com/GISKid/mapdatascience/tree/master/Data-Management](https://github.com/GISKid/mapdatascience/tree/master/Data-Management)
 
 And select "Download as zip" to download the files in Data-Management for this course
