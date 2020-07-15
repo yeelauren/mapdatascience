@@ -1,36 +1,33 @@
 ## Welcome to Data Management and Data Cleaning in R
 
+Please review the Data Management Outline and Data Management Setup Project-01.rmd that was sent to your email for more detailed instructions (they are also posted in the google drive link!)
+
 We will be using R Studio, to download R:
 
 https://rstudio.com/products/rstudio/download/#download
 
 Select the version of R Studio for your computer (e.g. Mac, Windows, Linux).
 
-Once the set-up is complete, run `install.packages(c('tidyverse','ggplot2', 'rmarkdown')`
+Once the set-up is complete, run `install.packages(c('tidyverse','ggplot2', 'rmarkdown'))`
 
 
 Presentations for sessions can be viewed here and downloaded from your browser: 
 
-Session 1 : [Session 1 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_1.html)
+# Session 1 :
 
-Week 1 Practice and Follow-along:
-
-[Practice](https://github.com/GISKid/mapdatascience/blob/master/Data-Management/Week_1_Practice.Rmd)
-
-[Follow-Along](https://github.com/GISKid/mapdatascience/blob/master/Data-Management/Session1_Titanic_Follow_along.Rmd)
-
+[Session 1 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_1.html)
 
 Download Exercises:
-
-Method 1:
+And select "Download as zip" to download the files in Data-Management for this course
 
 Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
 
-Method 2: 
 
-Go to : [https://github.com/GISKid/mapdatascience/tree/master/Data-Management](https://github.com/GISKid/mapdatascience/tree/master/Data-Management)
 
-And select "Download as zip" to download the files in Data-Management for this course
+[Recorded Session 1](https://register.gotowebinar.com/recording/792042405421547779) *requires a login 
+
+
+
 
 **Contact**: lauren@mapdatascience.com 
 
@@ -43,16 +40,19 @@ Session 1:
 - Introduction to Tidyverse
 
 Session 2:
+- Tidyverse mutate, group_by, summarize
 - Advanced Tidyverse in dplyr
 - Reshaping Data
 - Joins 
 
 Session 3:
+
+- Types of Data
 - Working with Dates
-- Introduction to Regex, stringr and stringi
-- R Markdown 
+- Working with lists and purr
+- Introduction to regex, stringr and stringi
 
 Session 4:
 - R Markdown Continued
-- Embedding tables
+- Embedding tables, plots 
 - Github version control
