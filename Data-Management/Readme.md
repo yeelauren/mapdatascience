@@ -1,6 +1,6 @@
 ## Welcome to Data Management and Data Cleaning in R
 
-Please review the Data Management Outline and Data Management Setup Project-01.rmd that was sent to your email for more detailed instructions (they are also posted in the google drive link!)
+Please review the [Data Management Outline](www.mapdatascience.com/Data-Management/Data-Management-Outline.html) and [Data Management Setup Project-01.rmd](www.mapdatascience.com/Data-Management/Data-Management-Setup-Project-01.html) that was sent to your email for more detailed instructions (they are also posted in the google drive link!)
 
 We will be using R Studio, to download R:
 
