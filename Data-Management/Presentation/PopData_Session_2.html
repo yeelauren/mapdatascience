@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Presentation Ninja</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Yihui Xie" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <link rel="stylesheet" href="style-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: middle center bg-main1
+
+
+
+#Data Management in R 
+##Session 2
+###July 16 th, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Course website](http://www.mapdatascience.com/Data-Management)
+### <span>&lt;i class="fas  fa-laptop faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Google Drive](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+&lt;/div&gt;
+
+
+---
+class: middle center bg-main1 black
+
+
+#What this course is:
+
+## An advanced look at tidyverse functions for data cleaning 
+## An introduction to R Projects for Data Management
+## Introducing RMarkdown into the Data Management workflow for final reporting
+
+
+#What this course is not:
+
+##  a deep dive into data visualization (ggplot2) or EDA
+
+## a course on statistics, modeling or prediction
+---
+class: bg-main1
+
+#Data Management and Cleaning in R 
+
+## Posted on website and google drive
+## Please review the .yellow[Data Management Outline] and the .yellow[Data Management Set up Project]
+
+## Webinar slides to guide through concepts with embedded R code
+## Practice exercises with many data to illustrate concepts 
+### - Go over practice exercises in webinar
+### - Go over it again on your own
+## .green[Apply] what you have learned to new data set with less guidance
+## At the end, structure your R Project, code and R Markdown for Reporting
+
+---
+class: split-two bg-main1 
+
+.column[.content[#R Learning Resources
+
+#RStudio
+
+R Studio develops free and open source tools for R. RStudio’s mission is to create free and open-source software for data science, scientific research, and technical communication.
+
+[Download R Studio](https://rstudio.com/products/rstudio/download/#download)
+
+[Cheatsheets](https://rstudio.com/resources/cheatsheets/)
+
+#R for Data Science
+
+Great free book for all things R
+https://r4ds.had.co.nz/
+]]
+.column[.content.bg-main-1[
+
+##R Markdown
+
+https://rmarkdown.rstudio.com/
+
+https://rmarkdown.rstudio.com/lesson-1.html
+
+[R Markdown Gallery](https://rmarkdown.rstudio.com/gallery.html)
+
+
+##Bad Data Handbook
+
+https://www.oreilly.com/library/view/bad-data-handbook/9781449324957/
+
+##Data Quality
+
+[Best Practices For Scientific Computing](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001745)
+
+[Manitoba Centre for Health Policy - Data Quality Framework for Administrative Data](http://umanitoba.ca/faculties/health_sciences/medicine/units/chs/departmental_units/mchp/protocol/media/Data_Quality_Framework.pdf)
+
+]
+]
+---
+class: middle center bg-main1
+
+# Today
+
+## - Tidyverse mutate, group_by, summarize
+
+## - Joins
+
+## - Advanced Tidyverse in dplyr
+
+## - Reshaping Data
+---
+class: bg-main black
+#Review
+
+&lt;img src='https://d33wubrfki0l68.cloudfront.net/e3f9e555d0035731c04642ceb58a03fb84b98a7d/4f070/diagrams/data-science-wrangle.png'&gt;
+
+&lt;img src='./Figures/RProcess.png', width='70%'&gt;
+
+
+---
+class: bg-main1
+
+#Review Reading in Data
+
+###Assigning `titanic` as the variable to hold our titanic data. `read_csv` will read in csv data and automatically determine the column types (character, numeric, factor, date, etc.)
+
+
+```r
+titanic&lt;-read_csv("./Raw Data/titanic.csv")
+```
+
+```
+## Parsed with column specification:
+## cols(
+##   PassengerId = col_double(),
+##   Survived = col_double(),
+##   Pclass = col_double(),
+##   Name = col_character(),
+##   Sex = col_character(),
+##   Age = col_double(),
+##   SibSp = col_double(),
+##   Parch = col_double(),
+##   Ticket = col_character(),
+##   Fare = col_double(),
+##   Cabin = col_character(),
+##   Embarked = col_character()
+## )
+```
+
+---
+
+class: split-two bg-main1 black with-thick-border
+
+.column[.content[
+#Review Dplyr
+
+###First argument is *always* a data frame/tibble
+###Subsequent arguments say what to do with that data frame
+###Pipes %&gt;% represent "and then..."
+
+###`count` counts the observations in a group
+
+
+```r
+titanic %&gt;%
+  count()
+```
+
+```
+## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1  1309
+```
+
+]]
+
+.column[.content[
+
+
+```r
+titanic %&gt;%
+  count(Sex)
+```
+
+```
+## # A tibble: 2 x 2
+##   Sex        n
+##   &lt;chr&gt;  &lt;int&gt;
+## 1 female   466
+## 2 male     843
+```
+
+
+```r
+titanic %&gt;%
+  count(Survived)
+```
+
+```
+## # A tibble: 3 x 2
+##   Survived     n
+##      &lt;dbl&gt; &lt;int&gt;
+## 1        0   549
+## 2        1   342
+## 3       NA   418
+```
+
+]]
+
+---
+
+class: bg-main1 black
+
+## `sample_n` / `sample_frac` for a random sample
+
+## - `sample_n`: randomly sample 5 observations
+
+
+```r
+titanic_n5 &lt;- titanic %&gt;%
+  sample_n(5, replace = FALSE)
+dim(titanic_n5)
+```
+
+```
+## [1]  5 12
+```
+
+## - `sample_frac`: randomly sample 20% of observations
+
+
+```r
+titanic_perc20 &lt;-titanic %&gt;%
+  sample_frac(0.2, replace = FALSE)
+dim(titanic_perc20)
+```
+
+```
+## [1] 262  12
+```
+
+---
+class: bg-main1 black
+
+## `distinct` to filter for unique rows
+
+##And `arrange` to order alphabetically
+
+
+```r
+titanic %&gt;% 
+  select(Pclass, Fare) %&gt;% 
+  distinct() %&gt;% 
+  arrange(Fare, Pclass)
+```
+
+```
+## # A tibble: 289 x 2
+##    Pclass  Fare
+##     &lt;dbl&gt; &lt;dbl&gt;
+##  1      1  0   
+##  2      2  0   
+##  3      3  0   
+##  4      3  3.17
+##  5      3  4.01
+##  6      1  5   
+##  7      3  6.24
+##  8      3  6.44
+##  9      3  6.45
+## 10      3  6.50
+## # ... with 279 more rows
+```
+
+---
+class: bg-main1 black
+
+## `summarise` to reduce variables to values
+
+
+```r
+titanic %&gt;%
+  summarise(avg_fare = mean(Fare,na.rm=T))
+```
+
+```
+## # A tibble: 1 x 1
+##   avg_fare
+##      &lt;dbl&gt;
+## 1     33.3
+```
+
+---
+class: bg-main1 black
+
+## `group_by` to do calculations on groups
+
+
+```r
+titanic %&gt;%
+  group_by(Sex) %&gt;%
+  summarize(avg_fare = mean(Fare,na.rm=T))
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 2 x 2
+##   Sex    avg_fare
+##   &lt;chr&gt;     &lt;dbl&gt;
+## 1 female     46.2
+## 2 male       26.2
+```
+
+
+---
+class: inverse, center, middle
+
+# Select
+
+Often we may be given a dataset with many columns and rows that we do not need for our own purposes. To reduce this data, we can take a **subset** of it. In `dplyr` there are two main functions for this purpose *selection* and *filtering*.
+
+Selections allow you to choose the names of columns to retain or discard whereas
+
+Filters specify some values within rows that you want to keep or discard 
+
+---
+
+class: inverse, center, middle
+
+# Filtering 
+## Numeric Values
+
+---
+
+class: split-two bg-gray black
+
+.column[.content[# Filter
+
+###In most cases you may want a subset of data
+
+###You can filter numeric variables based on their values. The most used operators for this are
+`&gt;, &gt;=, &lt;, &lt;=, == and !=`
+
+
+###For filtering between two numeric values we can use:
+
+`filter(x&gt;=6, x &lt;=10)` or
+
+`filter(x&gt;=6 &amp; x &lt;=10)`
+
+`filter(between(x,6,10))`
+
+###Another handy tool is `near` where you can specify the `tol` or tolerance between numbers :
+
+`filter(near(x, 5, tol = 0.5))`
+###for instance will return any rows where x is between 5.5 and 4.5
+
+]]
+.column[.content[
+#Recall:
+
+&lt;style type="text/css"&gt;
+.scroll-100 {
+  max-height: 100px;
+  overflow-y: auto;
+  background-color: inherit;
+}
+&lt;/style&gt;
+
+
+```r
+titanic %&gt;%
+* filter(Age == 35, Sex=="female")%&gt;%
+* select(Name, Sex, Age, Fare)
+```
+
+```{.scroll-100}
+## # A tibble: 11 x 4
+##    Name                                                Sex      Age   Fare
+##    &lt;chr&gt;                                               &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Futrelle, Mrs. Jacques Heath (Lily May Peel)        female    35  53.1 
+##  2 Cameron, Miss. Clear Annie                          female    35  21   
+##  3 Harris, Mrs. Henry Birkhardt (Irene Wallach)        female    35  83.5 
+##  4 Ward, Miss. Anna                                    female    35 512.  
+##  5 Bissette, Miss. Amelia                              female    35 136.  
+##  6 Abbott, Mrs. Stanton (Rosa Hunt)                    female    35  20.2 
+##  7 Holverson, Mrs. Alexander Oskar (Mary Aline Towner) female    35  52   
+##  8 Hoyt, Mrs. Frederick Maxfield (Jane Anne Forby)     female    35  90   
+##  9 Geiger, Miss. Amalie                                female    35 212.  
+## 10 Schabert, Mrs. Paul (Emma Mock)                     female    35  57.8 
+## 11 McGowan, Miss. Katherine                            female    35   7.75
+```
+
+
+]]
+---
+
+class: inverse, center, middle
+
+# Filtering 
+## Across Multiple Columns
+
+---
+class: bg-main1 black
+
+#Filtering 
+
+
+###- `filter_all()` will filter all columns based on your criteria
+
+###- `filter_if()` requires a function that returns a boolean to indicate which columns to filter on. If true, the filter  will be applied to those columns.
+
+###- `filter_at()` requires you to specify columns inside a `vars()` argument for which the filtering will be done.
+
+## These functions have been _superseded_ by `dplyr`. Which means you may see them in the documentation or older tutorials but there is a newer, better way called `across`.
+
+---
+class: bg-main1 black
+
+#Column-wise Operations
+##Across
+
+`across(.cols, .fns)` **where**: 
+
+**.cols** are the columns you want to operate on using a tidy selection
+
+**.fns** is a function or list of functions to apply to each column
+
+###Look .yellow[across] the columns that contain .green[character values], and give us the .yellow[number of unique values] in that column
+
+
+```r
+titanic %&gt;%
+  summarise(across(where(is.character), ~ length(unique(.x))))
+```
+
+```
+## # A tibble: 1 x 5
+##    Name   Sex Ticket Cabin Embarked
+##   &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;    &lt;int&gt;
+## 1  1307     2    929   187        4
+```
+
+---
+class: split-two bg-main1 black
+
+.column[.content[
+
+
+
+
+#Mutate
+
+###`Mutate` is a function that defines and inserts new variables into a tibble. You can refer to existing variables by name.
+### Most often when you define a new variable with `mutate` you'll also want to save the resulting data frame, often by .yellow[writing over] the original data frame.
+
+### Create a family size variable by combining SibSp and Parch (including the passenger themselves)
+
+
+```r
+titanic &lt;- titanic %&gt;%
+    mutate(family_size = SibSp + Parch + 1)
+```
+
+
+```{.scroll-100}
+## # A tibble: 1,309 x 3
+##    SibSp Parch family_size
+##    &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;
+##  1     1     0           2
+##  2     1     0           2
+##  3     0     0           1
+##  4     1     0           2
+##  5     0     0           1
+##  6     0     0           1
+##  7     0     0           1
+##  8     3     1           5
+##  9     0     2           3
+## 10     1     0           2
+## # ... with 1,299 more rows
+```
+
+]]
+
+.column[.content[
+We can `recode` the 0 and 1 values contained in `Survived` to "Survived" or "Died"
+
+
+
+```r
+titanic %&gt;%
+  mutate(Survived = ifelse(Survived==1, "Survived",
+   ifelse(Survived==0,"Died", NA)
+  ))
+```
+
+```{.scroll-100}
+## # A tibble: 1,309 x 13
+##    PassengerId Survived Pclass Name                                                Sex      Age SibSp Parch Ticket            Fare Cabin Embarked family_size
+##          &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;                                               &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
+##  1           1 Died          3 Braund, Mr. Owen Harris                             male      22     1     0 A/5 21171         7.25 &lt;NA&gt;  S                  2
+##  2           2 Survived      1 Cumings, Mrs. John Bradley (Florence Briggs Thayer) female    38     1     0 PC 17599         71.3  C85   C                  2
+##  3           3 Survived      3 Heikkinen, Miss. Laina                              female    26     0     0 STON/O2. 3101282  7.92 &lt;NA&gt;  S                  1
+##  4           4 Survived      1 Futrelle, Mrs. Jacques Heath (Lily May Peel)        female    35     1     0 113803           53.1  C123  S                  2
+##  5           5 Died          3 Allen, Mr. William Henry                            male      35     0     0 373450            8.05 &lt;NA&gt;  S                  1
+##  6           6 Died          3 Moran, Mr. James                                    male      NA     0     0 330877            8.46 &lt;NA&gt;  Q                  1
+##  7           7 Died          1 McCarthy, Mr. Timothy J                             male      54     0     0 17463            51.9  E46   S                  1
+##  8           8 Died          3 Palsson, Master. Gosta Leonard                      male       2     3     1 349909           21.1  &lt;NA&gt;  S                  5
+##  9           9 Survived      3 Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)   female    27     0     2 347742           11.1  &lt;NA&gt;  S                  3
+## 10          10 Survived      2 Nasser, Mrs. Nicholas (Adele Achem)                 female    14     1     0 237736           30.1  &lt;NA&gt;  C                  2
+## # ... with 1,299 more rows
+```
+
+]]
+
+---
+class: bg-main1
+
+#Joins
+
+##There are three families of verbs designed to work with relational data:
+
+&lt;/br&gt;
+## **Mutating joins**, which add new variables to one data frame from matching observations in another (like `mutate()`).
+
+&lt;/br&gt;
+## **Filtering joins**, which filter observations from one data frame based on whether or not they match an observation in the other table (like `filter()`).
+&lt;/br&gt;
+
+## **Set operations**, which treat observations as if they were set elements.
+
+---
+class: bg-main1
+#Joins
+
+We have six join options in R. Each of these join functions take 
+at least three arguments: `x`, `y`, and `by`.
+
+- `x` and `y` are data frames to join
+- `by` is the variable(s) to join by
+
+Four of these join functions combine variables from the two data frames:
+
+- `inner_join()`: return all rows from `x` where there are matching values 
+in `y`, and all columns from `x` and `y`.
+
+- `left_join()`: return all rows from `x`, and all columns from `x` and `y`. 
+Rows in x with no match in y will have NA values in the new columns.
+
+- `right_join()`: return all rows from `y`, and all columns from `x` and `y`. 
+Rows in y with no match in x will have NA values in the new columns.
+
+- `full_join()`: return all rows and all columns from both `x` and `y`. Where 
+there are not matching values, returns NA for the one missing.
+
+And the other two join functions only keep cases from the left-hand data frame, 
+and are called **filtering joins**. We'll learn about these another time but 
+you can find out more about the join functions in the help files for any one 
+of them, e.g. `?full_join`.
+
+---
+class: split-two bg-gray with-border 
+
+.column[.content[
+#Join Example
+
+##Create a band
+
+```r
+band &lt;- tribble(
+   ~name,     ~band,
+  "Mick",  "Stones",
+  "John", "Beatles",
+  "Paul", "Beatles"
+)
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; band &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mick &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Stones &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Beatles &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+]]
+.column[.content[
+##Create an instrument table
+
+```r
+instrument &lt;- tribble(
+    ~name,   ~plays,
+   "John", "guitar",
+   "Paul",   "bass",
+  "Keith", "guitar"
+)
+```
+
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; plays &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; John &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Paul &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; bass &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Keith &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; guitar &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]]
+
+---
+class: bg-gray
+
+#Joins
+##What is common between `bands` and `instruments`?
+
+--
+&lt;img src="./Figures/beatles.png", width='80%'&gt;
+--
+
+---
+class: bg-gray 
+#Left Join
+
+##There are a few different syntaxes for joins in R. You can use the pipe approach where you call one `tribble` and then `pipe` into a join. 
+
+
+```r
+band %&gt;% left_join(instrument, by = "name")
+
+left_join(band,instrument,by="name")
+```
+
+&lt;img src="./Figures/Left_join.png"&gt;
+
+---
+class: bg-gray 
+#Right Join
+
+
+```r
+band %&gt;% right_join(instrument, by = "name")
+
+right_join(band,instrument,by="name")
+```
+
+&lt;img src="./Figures/Right_join.png"&gt;
+
+
+---
+class: bg-gray 
+#Full Join
+
+```r
+band %&gt;% full_join(instrument, by = "name")
+
+full_join(band,instrument,by="name")
+```
+
+&lt;img src="./Figures/Full_join.png"&gt;
+
+---
+class: split-two bg-gray with-border
+
+.column[.content[
+#Review types of Joins
+
+
+```r
+band %&gt;% left_join(instrument, by = "name")
+band %&gt;% right_join(instrument, by = "name")
+band %&gt;% full_join(instrument, by = "name")
+band %&gt;% inner_join(instrument, by = "name")
+```
+
+]]
+.column[.content[
+
+```
+## # A tibble: 3 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 Mick  Stones  &lt;NA&gt;  
+## 2 John  Beatles guitar
+## 3 Paul  Beatles bass
+```
+
+```
+## # A tibble: 3 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 John  Beatles guitar
+## 2 Paul  Beatles bass  
+## 3 Keith &lt;NA&gt;    guitar
+```
+
+```
+## # A tibble: 4 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 Mick  Stones  &lt;NA&gt;  
+## 2 John  Beatles guitar
+## 3 Paul  Beatles bass  
+## 4 Keith &lt;NA&gt;    guitar
+```
+
+```
+## # A tibble: 2 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 John  Beatles guitar
+## 2 Paul  Beatles bass
+```
+
+]]
+
+---
+
+class: bg-gray split-two with-border
+
+.column[.content[
+#Filtering Joins
+
+##Semi Join returns those in band that have a match in `instrument`
+
+```r
+band %&gt;% semi_join(instrument, by = "name")
+```
+
+&lt;img src="./Figures/semi_join.png"&gt;
+]]
+
+.column[.content[
+##Anti Join returns the rows in `band` that do not have a match `instruments`
+
+```r
+band %&gt;% anti_join(instrument, by = "name")
+```
+&lt;img src="./Figures/anti_join.png"&gt;
+
+]]
+---
+class: split-two bg-gray 
+
+.column[.content[
+#Joins continued
+
+###Let's use a similar example but here we define a new variable `instrument2`.
+
+###What if the variable names do not match?
+
+
+```r
+band &lt;- tribble(
+*  ~name,     ~band,
+  "Mick",  "Stones",
+  "John", "Beatles",
+  "Paul", "Beatles"
+)
+
+instrument2 &lt;- tribble(
+*   ~artist,   ~plays,
+   "John", "guitar",
+   "Paul",   "bass",
+  "Keith", "guitar"
+)
+```
+
+]]
+
+.column[.content[
+###We can use the following syntax to match `name` in `band` with the key `artist` in `instrument2`
+
+
+```
+## # A tibble: 3 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 Mick  Stones  &lt;NA&gt;  
+## 2 John  Beatles guitar
+## 3 Paul  Beatles bass
+```
+
+&lt;img src="./Figures/band_names.png"&gt;
+]
+]
+
+---
+class:bg-gray 
+
+#Join Problems
+
+###In the real world, joins can be a real pain when they go wrong...
+
+Here are a few things that you should do with your own data to make your joins go smoothly.
+
+Identifying the variables that form the .green[primary key] in each table. 
+You should usually do this based on your understanding of the data, not empirically by looking for a combination of variables that give a unique identifier. 
+If you just look for variables without thinking about what they mean, you might get (un)lucky and find a combination that’s unique in your current data but the relationship might not be true in general.
+
+Check that none of the variables in the .green[primary key] are missing. If a value is missing then it can’t identify an observation!
+
+ Check that your foreign keys match primary keys in another table. The best way to do this is with an `anti_join()`. It’s common for keys not to match because of data entry errors. Fixing these is often a lot of work.
+
+ If you do have missing keys, you’ll need to be thoughtful about your use of inner vs. outer joins, carefully considering whether or not you want to drop rows that don’t have a match.
+
+<span>&lt;i class="fas  fa-exclamation-triangle faa-flash animated " style=" color:red;"&gt;&lt;/i&gt;</span>Be aware that simply checking the number of rows before and after the join is not sufficient to ensure that your join has gone smoothly. If you have an inner join with duplicate keys in both tables, you might get unlucky as the number of dropped rows might exactly equal the number of duplicated rows!
+
+
+---
+class: bg-gray 
+# Take aways
+
+* `left_join()` retains all cases in _left_ data set
+* `right_join()` retains all cases in _right_ data set
+* `full_join()` retains all cases in _either_ data set
+* `inner_join()` retains _only_ cases in _both_ data sets
+
+
+* `semi_join()` extracts cases that _have_ a match
+* `anti_join()` extracts cases that _do not have_ a match 
+
+---
+class: bg-main1 center middle
+
+#Tidyr
+
+###With the data in tidy form, it’s natural to get a computer to do further summarization or to make a figure. 
+###Untidy Data may lead to issues with plotting and visualizations - check that your data is .green[tidy!]
+
+###See: https://tidyr.tidyverse.org/
+
+---
+
+class: split-two bg-main1
+
+.column[.content[
+#Reshaping Data with Tidyr
+
+##`pivot_longer`
+
+"lengthens" data, increasing the number of rows and decreasing the number of columns. The inverse transformation is pivot_wider()
+
+formerly known as `spread`
+
+Consider an example data set `religion and income`
+
+
+```{.scroll-100}
+## # A tibble: 18 x 11
+##    religion                `&lt;$10k` `$10-20k` `$20-30k` `$30-40k` `$40-50k` `$50-75k` `$75-100k` `$100-150k` `&gt;150k` `Don't know/refused`
+##    &lt;chr&gt;                     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;                &lt;dbl&gt;
+##  1 Agnostic                     27        34        60        81        76       137        122         109      84                   96
+##  2 Atheist                      12        27        37        52        35        70         73          59      74                   76
+##  3 Buddhist                     27        21        30        34        33        58         62          39      53                   54
+##  4 Catholic                    418       617       732       670       638      1116        949         792     633                 1489
+##  5 Don’t know/refused           15        14        15        11        10        35         21          17      18                  116
+##  6 Evangelical Prot            575       869      1064       982       881      1486        949         723     414                 1529
+##  7 Hindu                         1         9         7         9        11        34         47          48      54                   37
+##  8 Historically Black Prot     228       244       236       238       197       223        131          81      78                  339
+##  9 Jehovah's Witness            20        27        24        24        21        30         15          11       6                   37
+## 10 Jewish                       19        19        25        25        30        95         69          87     151                  162
+## 11 Mainline Prot               289       495       619       655       651      1107        939         753     634                 1328
+## 12 Mormon                       29        40        48        51        56       112         85          49      42                   69
+## 13 Muslim                        6         7         9        10         9        23         16           8       6                   22
+## 14 Orthodox                     13        17        23        32        32        47         38          42      46                   73
+## 15 Other Christian               9         7        11        13        13        14         18          14      12                   18
+## 16 Other Faiths                 20        33        40        46        49        63         46          40      41                   71
+## 17 Other World Religions         5         2         3         4         2         7          3           4       4                    8
+## 18 Unaffiliated                217       299       374       365       341       528        407         321     258                  597
+```
+]]
+
+.column[.content[
+
+
+```r
+relig_income %&gt;%
+* pivot_longer(-religion, names_to = "income", values_to = "count")
+```
+
+```
+## # A tibble: 180 x 3
+##    religion income             count
+##    &lt;chr&gt;    &lt;chr&gt;              &lt;dbl&gt;
+##  1 Agnostic &lt;$10k                 27
+##  2 Agnostic $10-20k               34
+##  3 Agnostic $20-30k               60
+##  4 Agnostic $30-40k               81
+##  5 Agnostic $40-50k               76
+##  6 Agnostic $50-75k              137
+##  7 Agnostic $75-100k             122
+##  8 Agnostic $100-150k            109
+##  9 Agnostic &gt;150k                 84
+## 10 Agnostic Don't know/refused    96
+## # ... with 170 more rows
+```
+]]
+---
+class: split-two bg-main1
+.column[.content[
+#Reshaping Data with Tidyr
+
+##`pivot_wider`
+###"widens" data, increasing the number of columns and decreasing the number of rows. The inverse transformation is `pivot_longer()`.
+### formerly known as `gather`
+
+
+```{.scroll-100}
+## # A tibble: 114 x 3
+##    fish  station  seen
+##    &lt;fct&gt; &lt;fct&gt;   &lt;int&gt;
+##  1 4842  Release     1
+##  2 4842  I80_1       1
+##  3 4842  Lisbon      1
+##  4 4842  Rstr        1
+##  5 4842  Base_TD     1
+##  6 4842  BCE         1
+##  7 4842  BCW         1
+##  8 4842  BCE2        1
+##  9 4842  BCW2        1
+## 10 4842  MAE         1
+## # ... with 104 more rows
+```
+
+]]
+
+.column[.content[
+
+
+```r
+fish_encounters %&gt;%
+  pivot_wider(names_from = station, values_from = seen)
+```
+
+```
+## # A tibble: 19 x 12
+##    fish  Release I80_1 Lisbon  Rstr Base_TD   BCE   BCW  BCE2  BCW2   MAE   MAW
+##    &lt;fct&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+##  1 4842        1     1      1     1       1     1     1     1     1     1     1
+##  2 4843        1     1      1     1       1     1     1     1     1     1     1
+##  3 4844        1     1      1     1       1     1     1     1     1     1     1
+##  4 4845        1     1      1     1       1    NA    NA    NA    NA    NA    NA
+##  5 4847        1     1      1    NA      NA    NA    NA    NA    NA    NA    NA
+##  6 4848        1     1      1     1      NA    NA    NA    NA    NA    NA    NA
+##  7 4849        1     1     NA    NA      NA    NA    NA    NA    NA    NA    NA
+##  8 4850        1     1     NA     1       1     1     1    NA    NA    NA    NA
+##  9 4851        1     1     NA    NA      NA    NA    NA    NA    NA    NA    NA
+## 10 4854        1     1     NA    NA      NA    NA    NA    NA    NA    NA    NA
+## 11 4855        1     1      1     1       1    NA    NA    NA    NA    NA    NA
+## 12 4857        1     1      1     1       1     1     1     1     1    NA    NA
+## 13 4858        1     1      1     1       1     1     1     1     1     1     1
+## 14 4859        1     1      1     1       1    NA    NA    NA    NA    NA    NA
+## 15 4861        1     1      1     1       1     1     1     1     1     1     1
+## 16 4862        1     1      1     1       1     1     1     1     1    NA    NA
+## 17 4863        1     1     NA    NA      NA    NA    NA    NA    NA    NA    NA
+## 18 4864        1     1     NA    NA      NA    NA    NA    NA    NA    NA    NA
+## 19 4865        1     1      1    NA      NA    NA    NA    NA    NA    NA    NA
+```
+
+]]
+
+
+---
+class: middle center bg-main1
+
+#Data Management in R 
+##Session 2
+###July 16 th, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Course website](http://www.mapdatascience.com/Data-Management)
+### <span>&lt;i class="fas  fa-laptop faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Google Drive](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+###<span>&lt;i class="fas  fa-chevron-right faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>Review: Week_1_Practice_01.Rmd and Week_1_Practice_02.rmd
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+
+
+&lt;/div&gt;
+
+---
+
+#References
+
+Portions of this material are derived from:
+
+RStudio's 'Learning Tidyverse'
+
+[Data Carpentry](http://swcarpentry.github.io) [datasciencebox.org](https://datasciencebox.org)
+
+Estrellado, R. A., Bovee, E. A., Motsipak, J., Rosenberg, J. M., &amp; Velásquez, I. C. (in press). Data science in education using R. London, England: Routledge. Nb. All authors contributed equally
+
+https://stat545.com/
+
+https://r4ds.had.co.nz/
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"countIncrementalSlides": false,
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
