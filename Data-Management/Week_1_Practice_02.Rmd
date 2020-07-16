@@ -1,0 +1,317 @@
+---
+title: "DataManagement_Exercise"
+author: "Lauren Yee"
+date: "13/07/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Prepare your Markdown file by loading any libraries you will use. For this exercise we will be using the `tidyverse` and `ggplot2` libraries.
+
+You may have to install these libraries if you do not already have these installed by using:
+(Hint: Remove the `#` from the chunk below to install the packages, this is known as a "comment")
+
+```{r install}
+# install.packages(c('tidyverse','ggplot2'))
+
+```
+
+## Load libraries
+
+```{r load libraries}
+
+library(tidyverse)
+library(ggplot2)
+
+
+```
+
+# Load in the data
+
+If we want to quickly look at all the data in the folder we can use:
+
+```{r list files}
+list.files("./Raw Data/")
+
+```
+List files is a powerful tool that is often overlooked.
+
+We can look for specific types of files with list.files
+
+```{r list files type}
+list.files("./Raw Data/", pattern = '.csv')
+
+list.files("./Raw Data/", pattern = '.xlsx')
+
+```
+
+
+If your `Corr_2016` is zipped, unzip it with your unzipping program (Winrar, 7zip) before continuing. 
+Or you can use:
+
+```{r unzip}
+# unzip('./Raw Data/Corr_2016.zip', exdir = "./Raw Data")
+```
+
+Where the first argument is the path of the zip file you want to unzip and `exdir` is the folder you want to unzip the file to.
+
+You only need to unzip the file once, so once this is done, you can comment out the above code with a `#` in front of `unzip`. Or change the chunk to:
+
+>{include=FALSE, eval=FALSE}
+
+Let's load the data using `readr` for this example exercise [read more here](https://readr.tidyverse.org/index.html). 
+
+We will be working with the deaths_2016.xlsx, Population_Estimates.xlsx, Corr_2016.csv and Weather_data.csv. These data are from the Introduction to Data Management course developed by Megan Striha and this data is reused for this exercise. 4 data sets will be used in this course:
+
+
+Mortality Data
+Population Data
+Correspondence Files
+Environmental Data
+
+#Research Questions
+
+Analysis 1: Calculate age and sex specific cancer mortality rates by health region in BC
+Analysis 2: Link environmental data to the cancer mortality data to perform an odds ratio analysis *
+
+*if this analysis where to be done in the real world, it would be better to use cancer cases rather than mortality data, but for this course, the cleaning and data management (and not the analysis or research question) is of the focus.
+
+# Data Description
+
+**Population Data** – estimates of people in BC, by sex, age, and Health Service Delivery Area.
+		File name: Population_Estimates.csv
+
+
+**Mortality Data** – records of deaths are collected by each province and territory, then joined together to national level data at Statistics Canada. The data contains personal identifiers (age, sex, residence, marital status, etc.) and details about the nature of the death (ICD-10 codes).
+		File name: Deaths_2016.xlsx
+		
+**Geographical Correspondence File**  – contains two associated levels of geography, in this case, DB (dissemination block) and Health Service Delivery Area.
+		File name: Corr_2016.csv
+
+**Environmental Data File**  – contains weather data by postal code. For this analysis, the variables for average  daily high and average daily low temperature will be used to determine if the postal code is located in a cold climate.
+
+		File name: Weather_data.csv
+		
+Unlike the population data that is used in this course, the mortality data is fictitious. 
+
+The mortality data has been created based on real mortality counts, causes of death, and sex, but with imputed birth and death dates, and geographical values.
+
+This course uses fictitious 2016 mortality data, which contains sex, geographical variables, cause of death (underlying cause of death, ICD10 codes), marital status, location of death (in hospital, at home, etc.), and the day, month and year of birth and death.		
+
+The mortality data in Canada lists cause of death using ICD10 codes. ICD stands for the International Classification of Disease, while the ‘10’ indicates the 10th edition of the list. Prior to 2000, Canada used ICD9 codes, which causes a bit of a headache when comparing causes of death across editions.
+
+For this course, weather data from CANUE will be used as the exposure data. The exposure variable is the presence or absence of a cold climate. A cold climate is defined as a daily average high temperate less than 10 degrees Celsius, with a daily average low temperature less than -3 degrees Celsius.
+
+This data is real, although it is being joined to mortality data that is fictitious, so the results of the analysis will not have any practical research meaning. 
+
+The weather data set includes average temperatures, days of extreme heat and cold, days of frost, etc., all organized by postal code. 
+
+Correspondence files can take a number of different forms, but primarily, they allow one piece of information to be “matched” to another. These can sometimes take the form of data keys.
+
+For this course, we will be using a geographic correspondence file. 
+
+In our mortality data, we have a low level of geography (similar to a postal code). We need a correspondence file to figure out which province, health authority and health service delivery area that geographic code belongs to, in order to group our death by geography.
+
+The particular correspondence file that we will be using is available here: https://www150.statcan.gc.ca/n1/pub/82-402-x/2017001/corr-eng.htm
+
+
+Wait, `readr` doesn't have any functions for files ending in `.xlsx`. If we check the documentation and search for xlsx or excel it makes no mention of it. 
+Thankfully the tidyverse also has `readxl` bundled with it and `read_excel`. 
+
+```{r load data}
+library(readxl)
+mort<- read_excel("./Raw Data/deaths_2016.xlsx")
+pop <- read_csv("./Raw Data/Population_Estimates.csv")
+corr <- read_csv ("./Raw Data/Corr_2016.csv")
+env <- read_csv ("./Raw Data/Weather_data.csv")
+
+```
+
+#Explore the data
+
+Type `?str` and `?summary` into the R console. Both of these functions give high level insights into our data.
+
+```{r EDA}
+str(mort)
+summary(mort)
+
+str(pop)
+summary(pop)
+
+str(corr)
+summary(corr)
+
+str(env)
+summary(env)
+
+
+```
+
+We just broke one of our rules to not repeat our code! We will deal with this later...
+
+
+We can also use the `dplyr` function `glimpse`:
+
+```{r glimpse}
+
+glimpse(mort)
+
+```
+
+
+Investigate:
+
+1. How many health regions are in the data?
+2. How many men died of cancer? How many women?
+3. How many babies are in BC (under one year)?
+
+
+```{r healtregions}
+unique(corr$hrname_english)
+
+```
+
+If we look through these Health Regions, we can see that there is something strange going on with a few entries from Quebec.
+When working with English/French data, the encoding of the text can display wrong during import. We can fix this by re-importing the `Corr` data and specifying the `locale`. Sometimes this will resolve the issue, other times it may be more of a manual exercise that requires recoding of variables and working with `stringr`. We will be looking at `stringr` in Session 3.
+
+```{r reload corr}
+corr <- read_csv ("./Raw Data/Corr_2016.csv",locale = readr::locale(encoding = "latin1"))
+
+unique(corr$hrname_english)
+```
+
+If we simply wanted the number of health regions we can use:
+
+```{r number_of_regions}
+
+no_regions<-corr %>%distinct(hrname_english)%>%nrow()
+
+```
+
+
+There are `r no_regions` Health Regions in the corr data set.
+
+```{r investigation}
+
+##----------------------------------------------------
+## How many men died of cancer? How many women?
+##----------------------------------------------------
+mort %>% count(Sex)
+#or
+mort %>% group_by(Sex)%>%count()
+
+##----------------------------------------------------
+## How many babies are in BC (under one year)?
+##----------------------------------------------------
+sum(pop$`<1`)
+pop%>%
+  summarize(Total_below_1 = sum(`<1`))
+
+```
+
+When column names do not start with a character or letter, the syntax changes. For example `pop$<1` will not return any values. When columns are named incorrectly (with spaces, starting with a symbol or number), we can refer to them using the forward ticks shown above. In practice, we should be converting all columns to a better format, it makes for quicker coding and ensures that future work or analysis will not be hampered by column names.
+
+
+If we look closer at the population data some of the column name do not make much sense.
+Both `names` and `colnames` do the same thing and list the column names. In R, there are always more than one way to do things.
+
+```{r column names}
+names(pop)
+colnames(pop)
+
+```
+
+The 6th column"04-Jan" should be the next age group after <1 year old. The interval between years is 5. Therefore "04-Jan" should probably be "01-04" or some variation of that.
+For tidy data we need to make sure that our column names start with a character and not a numeric value. This is a problem since so many age columns start with numbers and need to be cleaned up!
+
+We are going to use `rename` to rename the three columns. Note: There are many different approaches to this problem.
+
+```{r}
+
+pop2 <- pop %>%
+  rename("01-04"="04-Jan",
+        "05-09" ="09-May",
+        "10-14"="14-Oct")
+
+```
+
+
+This is one approach, here is another using pivot_longer, lets remove X1 and Total while we're at it using `select`. After removing the `X1` and `Total` columns...
+In `pivot_longer` the `cols` argument defines the columns that you want to combine under "Age". We can look at the actual column position where Age starts which is column 4 or "<1". From there everything is an Age until Total, which is the 23rd column. Therefore `4:23` selects all columns from the 5th position to the 24th position.
+
+
+```{r}
+pop_long<-pop %>%
+  select(-c(X1,Total))%>%
+  pivot_longer(cols = 4:23,
+                 names_to = "Age",
+               values_to = "Value")
+  
+pop_long
+```
+
+Examine how the data is different from `pop` to `pop_long`. Type both in your console to compare.
+
+We can now recode the values in the long format by using `case_when`. See `?case_when` for details and https://dplyr.tidyverse.org/reference/case_when.html
+
+First we are going to `mutate` the existing `Age` variable.  Then we are saying:
+
+_when_ `age` is equal to "04-Jan", assign (~) these rows the value of "01-04",
+_when_ `age` is equal to "09-May", assign these rows the value of "05-09",
+_when_ `age` is equal to "14-Oct", assign these rows the value of "10-14",
+_when_ the conditions above are not matched, assign these rows the value that they already had
+
+```{r reformat}
+pop_long =  pop_long %>%
+  mutate(Age = case_when(
+          Age =="04-Jan" ~ "01-04",
+          Age =="09-May" ~ "05-09",
+          Age =="14-Oct" ~   "10-14",
+          TRUE ~ Age
+             
+           )
+  )
+       
+```
+
+Below we have altered the code above by removing the last line - why is this wrong? What happens to the other values?
+
+```{r recode wrong}
+pop %>%
+  select(-c(X1,Total))%>%
+  pivot_longer(cols = 4:23,
+                 names_to = "Age",
+               values_to = "Value")%>%
+  mutate(Age = case_when(
+          Age =="04-Jan" ~ "01-04",
+          Age =="09-May" ~ "05-09",
+          Age =="14-Oct" ~   "10-14"
+          # TRUE ~ Age
+             
+           )
+  )
+
+```
+
+It is important to double check that when you recode values!
+
+
+If you "knit" this document, make sure you have commented out the "unzip" chunk. Note that all of the outputs will be "knitted" to the word output. Some of which is not intuitive or pretty for a display in a word document. Refer to the R Markdown documentation to alter the chunks and their display in word.
+
+See: https://rmarkdown.rstudio.com/lesson-3.html
+
+
+Next week:
+
+We will continue cleaning and reshaping the data. We will look into dates, regex, advanced functions and working with lists. 
+
+You will structure your own analysis Project in R to create a polished R Markdown document.
+
+
+
+
+

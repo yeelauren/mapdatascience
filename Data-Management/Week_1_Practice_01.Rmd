@@ -1,0 +1,460 @@
+---
+title: "Session1_Exercise"
+author: "Lauren"
+date: "July 14th, 2020"
+output: word_document
+---
+
+```{r setup, include=FALSE,fig.path = 'Figs/', dev="png",dpi=300}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Week One
+
+*Note:* This document as is, will not "knit" since there are chunks that need to be corrected and fixed by us! I've included some of Session 1 in this document as a reminder for the initial steps we took (that we will need for this analysis!)
+
+Welcome ! This Markdown document is set up to export this analysis into word. Including all of the code, plots, and outputs. We can see what options are applied globally in the above "chunk", where `echo=true`. Echo will repeat the R code back to you, evaluate the code and also include the output.
+
+Above this chunk is the YAML header. You can edit this to include today's date and your name.
+
+As a reminder the data and materials can be found at: [Map Data Science](www.mapdatascience.com).
+Instructions for setting up your Project can be found in the Data-Management-Setup-Project-01.rmd or in the word document.
+Additionally, the Data-Management-Outline provides instructions for installing and working through the basics of R. Come back to these resources if you are new to R. It is recommended that you review this file both in R and in word to gain a better understanding for how RMarkdown works to generate word documents.
+
+
+##Psuedo Code
+
+###Objectives:
+
+1. Explore Titanic Data Set
+2. Format and clean data
+3. Create summaries and plots
+
+Let's structure our document into the sections as pseudocode:
+
+## Load Packages
+## Read in Data
+## Explore Titanic Data Set
+## Summarize data
+## Plot data
+
+At first it may be more general and as you move through your analysis, you might find more specific areas to explore in your data.
+In later steps we will add "Cleaning" Data to this list.
+
+## Load Packages
+```{r load packages}
+library(tidyverse)
+library(ggplot2)
+
+```
+
+#Load Data into R:
+
+Here we are using the titanic data for practice and the `readr` package from the `tidyverse`.
+We can gather more information about the Titanic data set by entering `?Titanic` into the console.
+This data set provides information on the fate of passengers on the fatal maiden voyage of the ocean liner ‘Titanic’, summarized according to economic status (class), sex, age and survival.
+
+The sinking of the Titanic is a famous event, and new books are still being published about it. Many well-known facts—from the proportions of first-class passengers to the ‘women and children first’ policy, and the fact that that policy was not entirely successful in saving the women and children in the third class—are reflected in the survival rates for various classes of passenger.
+
+These data were originally collected by the British Board of Trade in their investigation of the sinking. Note that there is not complete agreement among primary sources as to the exact numbers on board, rescued, or lost.
+
+Due in particular to the very successful film ‘Titanic’, the last years saw a rise in public interest in the Titanic. Very detailed data about the passengers is now available on the Internet, at sites such as Encyclopedia Titanica (https://www.encyclopedia-titanica.org/).
+
+Additionally, the Titanic Data dictionary is available under `./Raw Data/Titanic_DataDictionary`. The first sheet shows the names of the variables, the definition and key shows what the values are coded as. The second sheet provides more information about the specific variables. Please take some time to read about the data.
+
+ 
+
+```{r read data, echo=TRUE}
+
+titanic <- read_csv("./Raw Data/titanic.csv")
+
+```
+
+Be sure to read the data dictionary in the `Raw Data/` folder to get an understanding for the variable names.
+
+Data import generally feels one of two ways:
+
+    “Surprise me!” This is the attitude you must adopt when you first get a dataset. You are just happy to import without an error. You start to explore. You discover flaws in the data and/or the import. You address them. Lather, rinse, repeat.
+    “Another day in paradise.” This is the attitude when you bring in a tidy dataset you have maniacally cleaned in one or more cleaning scripts. There should be no surprises. You should express your expectations about the data in formal assertions at the very start of these downstream scripts.
+
+In the second case, and as the first cases progresses, you actually know a lot about how the data is / should be. My main import advice: use the arguments of your import function to get as far as you can, as fast as possible.Read the docs for the import functions and take maximum advantage of the arguments to control the import.
+
+# Explore Data
+
+Get a quick summary of the data, use `?str` in the console to learn more about what each function does
+
+```{r summary}
+str(titanic)
+summary(titanic)
+head(titanic)
+tail(titanic)
+```
+
+Take note of the **NA** values noted in summary.
+
+
+
+# Dplyr
+
+In dplyr, the first argument is *always* a data frame/tibble (I use the words data frame and tibble interchangeably here for simplicity, although they are slightly different)
+
+Subsequent arguments after the tibble say what to do with that data frame
+
+Let's get a summary of who survived and who did not:
+
+```{r survived}
+titanic %>%
+    count(Survived)
+
+
+```
+
+In this case, we are using `titanic` as the tibble, then piping `%>%` to then count the total number of values in the `Survived` column.
+This outputs a new tibble that gives us the values for Survived and the count of those values as `n`.
+
+For now, we are going to remove NA values from the data where Survived is NA.
+
+```{r titantic_na}
+titanic <- titanic %>% filter(!is.na(Survived))
+
+```
+
+In this case, we are using `titanic` as the tibble, then piping `%>%` to then `filtering` the NA values out of Survived to filter. The `!` negates the argument in the filter. `is.na` will find any matching NA values in the data, however we want to find anything that **is not** equal to **NA** so we use the `!` symbol.
+
+
+We are also going to recode this data to a "factor" type since factors contain the possible values of the data, whereas leaving this as a "numeric" column would mean that any value is possible between 0 and 1... aka 0.5, 0.8, 0.9 and we know that a person cannot be 0.5 alive.
+
+```{r titantic_na}
+titanic <- titanic %>% mutate(Survived=as.factor(Survived),
+                              Sex= as.factor(Sex))
+
+#or
+# titanic$Survived=as.factor(titanic$Survived)
+
+```
+
+There is another way to code your columns upon import. Read the documentation for `readr` or `?read_csv`.
+Column types are determined by reading the first 1000 rows of the data and estimating the type. In the cases above, it estimated that Survived was numeric after looking at 1000 rows of 1s and 0s. Since these variables are coded to mean "Survived" by 1 and "Died" by 0, we can also recode these values to make it clearer what 0 and 1 mean in plain english. We will be doing this in later sessions when we work with text.
+There are some cases when you import data for an analysis that examining the first 1000 rows will not be adequate.
+
+In these cases, if you know what columns should be factors, characters, dates, or numeric columns you can specify these directly. 
+Using `col_factor, col_character, col_date(),col_double()`
+
+
+
+```{r eval=FALSE}
+titanic = read_csv("./Raw Data/titanic.csv", col_types = cols(Survived= col_factor(),
+                                                          Sex= col_factor()))
+#Can also do short form "f" for factor
+#titanic = read_csv("./Data/titanic.csv", col_types = cols(Survived= "f",
+                                                          # Sex= "f")
+titanic <- titanic %>% filter(!is.na(Survived))
+```
+
+#Plot Data
+
+Let's plot this by age and then by sex.
+
+We use the `ggplot` function to do this. The first argument is the data frame, and 
+the next argument gives the mapping of the variables of the data to the `aes`thetic 
+elements of the plot. You can learn more about ggplot2 here: https://ggplot2.tidyverse.org/
+
+```{r eda_plots}
+titanic %>%
+    ggplot(aes(x=Age))+
+    geom_bar(position="stack")
+
+titanic %>%
+    ggplot(aes(x=Age, fill=Survived))+
+    geom_bar(position = position_dodge2(preserve = "single"))
+
+
+titanic %>%
+    ggplot(aes(x=Age, color=Survived))+
+    geom_freqpoly(binwidth = 1)
+
+
+titanic %>%
+    ggplot(aes(x=Sex, fill=Survived))+
+    geom_bar(position="stack")
+
+titanic %>%
+    ggplot(aes(x=Sex, fill=Survived))+
+    geom_bar(position = position_dodge2(preserve = "single"))
+
+```
+
+Notice how in the above chunk, we are using pipes to flow into `ggplot` which then requires us to use the `+` operator after we call `ggplot`.
+This is a common beginner mistake to make, so always make sure your `%>%` and `+` are in the right place. Running the chunk above will output all of the plots directly.
+
+We can also use ggplot in a different way where we include `titanic` in the `ggplot` call like so. We will define these plots as variables starting with `p_`:
+
+```{r p_variables}
+p_class = ggplot(titanic, mapping = aes(x = Pclass, fill = Survived, colour = Survived)) +
+  geom_bar(stat='count', position='fill') +
+  labs(x = 'Pclass') 
+
+p_emb = ggplot(titanic, aes(Embarked, fill = Survived)) +
+  geom_bar(stat='count', position='fill') +
+  labs(x = 'Embarked')
+
+p_sib = ggplot(titanic, aes(SibSp, fill = Survived)) +
+  geom_bar(stat='count', position='fill') +
+  labs(x = 'SibSp')
+
+p_par = ggplot(titanic, aes(Parch, fill = Survived)) +
+  geom_bar(stat='count', position='fill') +
+  labs(x = 'Parch') 
+
+p_fare = ggplot(titanic) +
+  geom_freqpoly(mapping = aes(Fare, color = Survived), binwidth = 0.05) +
+  scale_x_log10() 
+
+```
+
+Notice how when we run this chunk, nothing is displayed. This is because we assigned variables to each plot. To plot them in RMarkdown we need to call them in the chunk. Note that `p_fare` is in the log scale as deonated by `scale_x_log10()`
+
+```{r p_plots}
+p_class
+
+p_emb
+
+p_sib
+
+p_par
+
+p_fare
+```
+
+By examining these graphs, what trends or patterns do you observe? Some examples may be:
+
+- Younger children seem to have a better survival rate than young adults 
+
+- First class folks seem to have better survival rate as well.
+
+- Having multiple siblings and family members on board suggests a better survival than those who were traveling alone.
+
+- Those who embarked at "C" has a higher survival rate than at "S". There is also missing data for some who survived but have no Embarked location.
+
+- For lower fares, it appears that survival chances were lower. 
+
+- Some of these variables may be correlated together, so these are just general, exploratory findings for now. Think about why we might see these patterns in the data and also in the context of a ship! A lower fare may indicate placement in the Titanic that was less than ideal conditions, e.g. not where Leo or Kate Winslet was staying. These cabins with a lower fare may have been at a lower deck in the ship, further from life boats or in an area that was impacted directly by the collision with an ice berg. 
+
+
+# Back to dplyr...
+
+
+## Group_by
+
+Group_by asks for what columns we want to "group" the data. We want to see who survived by sex. 
+The next line is giving us a count of these two variables. We should expect a row for women who survived, women who died; and men who survived, and men who died.
+
+```{r group_by}
+
+titanic %>%
+    group_by(Survived, Sex)%>%
+    count()
+
+```
+
+
+#Filter 
+
+Complete the code below to filter the data by males and survivors. Then plot by age:
+
+```{r filter}
+
+male_survived <- titanic %>%
+    filter(Sex== & Survived==)
+
+
+male_survived%>%
+    ggplot(aes(x=Age))+
+    geom_bar()
+
+
+```
+
+Compare `male_survived` to the plot. What happened to the values in Age that are `NA` ? 
+Any weird values you would not expect?
+
+
+#Selection
+
+Select only age and sex from `male_survived` and then summarize the data
+
+```{r selection}
+#This is the answer to above
+male_survived <- titanic %>%
+    filter(Sex=='male' & Survived==1)
+
+male_survived<-male_survived%>%
+    select(Age,Sex)
+male_survived%>%
+    group_by(Age,Sex)%>%
+    count()
+
+
+male_survived%>%
+    group_by(Age,Sex)%>%
+    count()%>%
+    arrange(n)
+
+male_survived%>%
+    group_by(Age,Sex)%>%
+    count()%>%
+    arrange(desc(n))
+
+male_survived%>%
+    group_by(Age,Sex)%>%
+    count()%>%
+    ggplot(aes(x=Age,y=n))+
+    geom_col()
+```
+
+How might we want to summarize this data even further?
+
+
+## Your Turn
+
+1. Create a new variable called `female_survived` that filters the titanic data to just women.
+2. Select Name, Age and PClass
+
+```{r women}
+
+
+```
+
+
+
+#Mutate
+
+
+Create a family size variable by combining SibSp and Parch (including the passenger themselves)
+
+```{r mutate, echo=TRUE}
+
+titanic <- titanic %>%
+    mutate(family_size = SibSp + Parch + 1)
+
+
+```
+
+
+#Summarize
+
+Complete the code below to summarize the total and average Fare between men and women. Remember to use `na.rm=T` to remove NAs (Hint `?sum`, `?mean`)
+Who paid more?
+
+```{r summarize}
+titanic %>%
+    group_by()%>%
+    summarize(Total = , Average_Fare =)
+
+
+```
+
+##Embed results into narrative
+
+Let's create new variables to use in our markdown text:
+
+```{r surv}
+
+surv <- titanic %>% count(Survived) %>% filter(Survived == 1) %>% .$n
+nosurv <- titanic %>% count(Survived) %>% filter(Survived == 0) %>% .$n
+
+```
+
+`r surv/(surv+nosurv)*100` percent of passengers survived the disaster.
+
+
+Investigate the Cabins:
+
+Examine Cabin name. The first character is the deck. The next is the room number
+
+```{r cabin}
+titanic %>% distinct(Cabin)
+
+
+```
+
+How many unique Cabin names are there?
+
+There is a few that have more than one Cabin and room number. Why might this be?
+
+The first filter shows that all passengers with the last name Fortune, have the same Ticket Number and paid the same fare.
+
+We can assume this is likely one family, that paid all at once on the same ticket.
+
+The second filter is looking for entries without a cabin. 
+
+```{r cabin room}
+
+titanic %>% filter(Cabin=="C23 C25 C27")
+
+
+titanic %>% filter(is.na(Cabin))
+```
+
+Investigate what could be going on with our first row where the cabin is missing.
+
+Braund, Mr. Owen Harris seems to have one Sibling on board, but a missing cabin. Let's see if we can fill in some blanks, by first finding their sibling.
+Let's assume they would have the same last name.
+
+Is there a matching Ticket to find their sibling?
+
+```{r investigate}
+titanic %>% filter(str_detect(Name,"Braund"))
+
+
+
+```
+
+Could we consider these two Braunds, related? Do we have enough information to conclude one way or another? 
+
+Investigating row by row like this isn't always feasible, but looking through your data like a **Data Detective** can help you better understand where missing data is coming from and where it may be found, or the relationships to the underlying data.
+
+In the example above with the Fortune family, each family has the same ticket number, cabin, class, fare and embarked. 
+
+The Braund family has a different ticket number, slightly different fare, the same class, one sibling, and both embarked from the same location.
+
+Let's keep this in mind.
+
+
+
+#Activity
+
+Realistically we may jump from exploratory data analysis and summaries, to plots and back and forth. After exploring the data with plots, we will consider what plots should be used to show this information best in a final report. Think about what plots are useful to you, the analyst in deciding how to clean your data and investigate research questions. Now consider the type of plots and information that a manager or the general public would be interested in. They should **not** always be the same.
+
+1. Recreate the plots in `p_plots` with the recoded survival variable (refer to slides)
+2. Investigate the family that has the last name `Palsson`. What is common between these rows? 
+3. What is the median fare by gender? 
+4. What is the mean fare by Embarked? What was the most expensive place to embark from, on average?
+
+
+
+#Activity #2
+
+
+Consider another built in R data set by loading `data(who)` in your console. 
+
+This data set contains more information, type `?who` into the R console. 
+
+1.  What is the description of this data set?
+
+
+```{r}
+#?who
+data(who)
+
+head(who)
+
+
+```
+
+2. What is the meaning behind the columns that are structured like this `new_sp_m014`? What does the `new` mean? What about `sp`? And `m014`?
+
+Next week, we will explore this data set with regex.
+
+
