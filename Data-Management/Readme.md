@@ -18,7 +18,6 @@ Presentations for sessions can be viewed here and downloaded from your browser:
 [Session 1 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_1.html)
 
 Download Exercises:
-And select "Download as zip" to download the files in Data-Management for this course
 
 Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
 
