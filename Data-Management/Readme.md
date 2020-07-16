@@ -26,6 +26,8 @@ Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l
 # Session 2:
 
 [Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_2.html)
+
+
 Download Exercises:
 
 **Week_1_Practice_01.rmd**
