@@ -21,12 +21,18 @@ Download Exercises:
 
 Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
 
-
-
 [Recorded Session 1](https://register.gotowebinar.com/recording/792042405421547779) *requires a login 
 
+# Session 2:
 
+[Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_2.html)
+Download Exercises:
 
+**Week_1_Practice_01.rmd**
+
+**Week_1_Practice_02.rmd**
+
+Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
 
 **Contact**: lauren@mapdatascience.com 
 
