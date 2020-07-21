@@ -39,7 +39,7 @@ Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l
 
 # Session 3:
 
-Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_3.html)
+[Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_3.html)
 
 [Recorded Session 3]()*requires a login 
 
