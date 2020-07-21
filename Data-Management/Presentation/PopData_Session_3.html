@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>PopData_Session_3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lauren" />
+    <meta name="date" content="2020-11-06" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome/js/fontawesome-all.min.js"></script>
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <link href="libs/str_view/str_view.css" rel="stylesheet" />
+    <script src="libs/str_view-binding/str_view.js"></script>
+    <link rel="stylesheet" href="style-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+class: middle center bg-main1
+
+#Data Management in R 
+##Session 3
+###July 21st, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Course website](http://www.mapdatascience.com/Data-Management)
+### <span>&lt;i class="fas  fa-laptop faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Google Drive](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+###<span>&lt;i class="fas  fa-chevron-right faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>Review: Week_2_Practice_01.Rmd and Week_2_Practice_02.rmd
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+
+
+&lt;/div&gt;
+
+---
+class:  bg-deep-purple
+
+# .yellow[Types of Data]
+# Functions
+# Introduction to regex, stringr 
+# Working with lists and purr  
+# Working with Dates
+
+---
+class: split-two bg-deep-purple 
+
+.column[.content[
+
+# Joins continued
+
+## What about .yellow[duplicate keys] in a join?
+## .yellow[One table] has duplicate keys. This is useful when you want to add in additional information as there is typically a one-to-many relationship.
+&lt;/br&gt;
+
+&lt;img src = 'https://d33wubrfki0l68.cloudfront.net/6faac3e996263827cb57fc5803df6192541a9a4b/c7d74/diagrams/join-one-to-many.png'&gt;
+
+]]
+
+.column[.content[
+
+
+```r
+x &lt;- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     1, "x4"
+)
+y &lt;- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2"
+)
+left_join(x, y, by = "key")
+```
+
+```
+## # A tibble: 4 x 3
+##     key val_x val_y
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+## 1     1 x1    y1   
+## 2     2 x2    y2   
+## 3     2 x3    y2   
+## 4     1 x4    y1
+```
+
+]]
+
+---
+class: split-two
+
+.column[.content[
+#Joins continued
+## .green[Both tables] have duplicate keys
+## This is usually an error because in neither table do the keys uniquely identify an observation. When you join duplicated keys, you get all possible combinations
+&lt;/br&gt;
+&lt;img src = 'https://d33wubrfki0l68.cloudfront.net/d37530bbf7749f48c02684013ae72b2996b07e25/37510/diagrams/join-many-to-many.png'&gt;
+]]
+
+.column[.content[
+
+```r
+x &lt;- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     3, "x4"
+)
+y &lt;- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     2, "y3",
+     3, "y4"
+)
+left_join(x, y, by = "key")
+```
+
+```
+## # A tibble: 6 x 3
+##     key val_x val_y
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+## 1     1 x1    y1   
+## 2     2 x2    y2   
+## 3     2 x2    y3   
+## 4     2 x3    y2   
+## 5     2 x3    y3   
+## 6     3 x4    y4
+```
+]
+]
+---
+
+class: split-two bg-deep-purple
+
+
+# .yellow[Advanced Selections]
+
+
+###`%in%` operator
+
+###`starts_with()`
+
+###`ends_with()`
+
+###`contains()`
+
+###`matches()`
+
+
+See: https://dplyr.tidyverse.org/reference/select.html for a comprehensive list
+
+
+
+
+---
+class: bg-deep-purple
+
+#Advanced Mutate
+
+###Used to be `mutate_at` `mutate_if`, etc. In the most recent version of `dplyr` the syntax is now `across`.
+across() makes it easy to apply the same transformation to multiple columns, allowing you to use select() semantics inside in summarise() and mutate()
+
+
+```r
+# A named list of functions
+iris %&gt;%
+  group_by(Species) %&gt;%
+  summarise(across(starts_with("Sepal"), list(mean = mean, sd = sd)))
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 3 x 5
+##   Species    Sepal.Length_mean Sepal.Length_sd Sepal.Width_mean Sepal.Width_sd
+##   &lt;fct&gt;                  &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;
+## 1 setosa                  5.01           0.352             3.43          0.379
+## 2 versicolor              5.94           0.516             2.77          0.314
+## 3 virginica               6.59           0.636             2.97          0.322
+```
+
+
+```across2
+iris %&gt;%
+  group_by(Species) %&gt;%
+  summarise(across(starts_with("Sepal"), mean, .names = "mean_{col}"))
+
+```
+
+---
+
+
+#Summarize
+filter, select and mutate functions, summarise() comes with three additional functions for doing things to multiple columns in one go:
+
+    summarise_all() will summarise all columns based on your further instructions
+    summarise_if() requires a function that returns a boolean. If that is true, the summary instructions will be followed
+    sumarise_at() requires you to specify columns inside a vars() argument for which the summary will be done.
+
+###Summarize all
+
+The function summarise_all() requires a function as argument, which it will apply to all columns. The sample code calculates the mean for each column. I had to add the na.rm = TRUE argument to ignore NA values.
+
+
+###Summarize if
+The function summarise_if() requires two arguments:
+
+    First it needs information about the columns you want it to consider. This information needs to be a function that returns a boolean value. The easiest cases are functions like is.numeric, is.integer, is.double, is.logical, is.factor, lubridate::is.POSIXt or lubridate::is.Date.
+
+    Secondly, it needs information about how to summarise that data, which needs to be a function. If not a function, you can create a function on the fly using funs() or a tilde (see above).
+
+###Summarize at
+
+The function summarise_at() also requires two arguments:
+
+    First it needs information about the columns you want it to consider. In this case you need to wrap them inside a vars() statement. Inside vars() you can use anything that can be used inside a select() statement. Have a look here if you need more info.
+
+    Secondly, it needs information about how to summarise that data, which as above needs to be a function. If not a function, you can create a function on the fly using funs() or a tilde (see above).
+
+
+---
+
+class: middle center bg-deep-purple
+
+# .yellow[Functions]
+
+## Why functions?
+
+### Automate common tasks in a power powerful and general way than copy-and-pasting:
+###    - You can give a function an evocative name that makes your code easier to understand.
+###    - As requirements change, you only need to update code in one place, instead of many.
+###    - You eliminate the chance of making incidental mistakes when you copy and paste (i.e. updating a variable name in one place, but not in another).
+
+### Down the line: Improve your reach as a data scientist by writing functions (and packages!) that others use
+
+---
+class: middle center bg-deep-purple
+
+## When should you write a function?
+
+###Whenever you’ve copied and pasted a block of code more than twice.
+
+###Do you see any problems in the code below?
+
+
+.small[
+
+```r
+str(mort)
+summary(mort)
+
+str(pop)
+summary(pop)
+
+str(corr)
+summary(corr)
+
+str(env)
+summary(env))
+```
+]
+
+---
+class: split-two bg-deep-purple
+
+.column[.content[
+## Turn your code into a function
+
+- Pick a short but informative **name**, preferably a verb.
+- List inputs, or **arguments**, to the function inside `function`. If we had more the call would look like `function(x, y, z)`.
+- Place the **code** you have developed in body of the function, a `{` block that immediately follows `function(...)`.
+
+## Naming functions
+
+- Names should be short but clearly evoke what the function does
+
+- Names should be verbs, not nouns
+
+- Multi-word names should be separated by underscores (`snake_case` as opposed to `camelCase`)
+
+- A family of functions should be named similarly (`scrape_title`, `scrape_episode`, `scrape_genre`, etc.)
+
+- Avoid overwriting existing (especially widely used) functions
+]]
+
+.column[.content[
+
+```r
+var_summary &lt;- function(data, var) {
+  data %&gt;%
+    summarise(n = n(), min = min({{ var }}), max = max({{ var }}))
+}
+  
+  mtcars %&gt;%
+  group_by(cyl) %&gt;%
+  var_summary(mpg)
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 3 x 4
+##     cyl     n   min   max
+##   &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     4    11  21.4  33.9
+## 2     6     7  17.8  21.4
+## 3     8    14  10.4  19.2
+```
+
+]]
+
+---
+class: bg-main1 bg-gray black
+
+# Strings and `stringr`
+
+## Combining Strings
+
+```r
+string = "This is a string!"
+str_c("x", "y")
+```
+
+```
+## [1] "xy"
+```
+
+```r
+str_c("x", "y", sep = ", ")
+```
+
+```
+## [1] "x, y"
+```
+
+```r
+str_c("x", "y", sep = "-")
+```
+
+```
+## [1] "x-y"
+```
+
+```r
+str_c("prefix-", c("a", "b", "c"), "-suffix")
+```
+
+```
+## [1] "prefix-a-suffix" "prefix-b-suffix" "prefix-c-suffix"
+```
+
+---
+class: split-two bg-gray black
+.column[.content[
+# Strings
+
+## String Length
+
+
+```r
+str_length(c("a", "R for data science", NA))
+```
+
+```
+## [1]  1 18 NA
+```
+
+]]
+
+.column[.content[
+
+## Changing Case
+
+There are a few arguments for changing the cases of strings. `str_to_lower()`, `str_to_upper()` or `str_to_title()`
+
+
+```r
+str_to_lower(x)
+```
+
+```
+## Warning in stri_trans_tolower(string, locale = locale): argument is not an
+## atomic vector; coercing
+```
+
+```
+## [1] "c(1, 2, 2, 3)"                     "c(\"x1\", \"x2\", \"x3\", \"x4\")"
+```
+
+```r
+str_to_upper(x)
+```
+
+```
+## Warning in stri_trans_toupper(string, locale = locale): argument is not an
+## atomic vector; coercing
+```
+
+```
+## [1] "C(1, 2, 2, 3)"                     "C(\"X1\", \"X2\", \"X3\", \"X4\")"
+```
+
+```r
+str_to_title(x)
+```
+
+```
+## Warning in stri_trans_totitle(string, opts_brkiter = stri_opts_brkiter(locale =
+## locale)): argument is not an atomic vector; coercing
+```
+
+```
+## [1] "C(1, 2, 2, 3)"                     "C(\"X1\", \"X2\", \"X3\", \"X4\")"
+```
+
+
+]]
+---
+class: bg-gray black
+
+## Subsetting Strings
+
+### You can extract parts of a string using `str_sub()`. As well as the string, `str_sub()` takes start and end arguments which give the (inclusive) position of the substring
+
+### negative numbers count backwards from end
+
+
+```r
+x &lt;- c("Apple", "Banana", "Pear")
+str_sub(x, 1, 3)
+```
+
+```
+## [1] "App" "Ban" "Pea"
+```
+
+```r
+str_sub(x, -3, -1)
+```
+
+```
+## [1] "ple" "ana" "ear"
+```
+
+---
+
+class: inverse, center, middle
+
+# Regex
+## Very powerful, very hard to learn, easy to mess up
+---
+
+class: bg-gray black
+
+# Regex
+
+### Regexps are a very terse language that allow you to describe patterns in strings. They take a little while to get your head around, but once you understand them, you’ll find them extremely useful.
+
+### To learn regular expressions, use `str_view()` and `str_view_all()`. These functions take a character vector and a regular expression, and show you how they match. We’ll start with very simple regular expressions and then gradually get more and more complicated using `stringr`
+
+
+```r
+x &lt;- c("apple", "banana", "pear")
+str_view(x, "an")
+```
+
+<div id="htmlwidget-61eb11875381a5d8715c" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-61eb11875381a5d8715c">{"x":{"html":"<ul>\n  <li>apple<\/li>\n  <li>b<span class='match'>an<\/span>ana<\/li>\n  <li>pear<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+---
+class: bg-gray black
+
+# Regex
+
+### The next step up in complexity is `.`, which matches any character (except a newline):
+
+
+```r
+str_view(x, ".a.")
+```
+
+<div id="htmlwidget-15dbb50d4ab35e1f908a" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-15dbb50d4ab35e1f908a">{"x":{"html":"<ul>\n  <li>apple<\/li>\n  <li><span class='match'>ban<\/span>ana<\/li>\n  <li>p<span class='match'>ear<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+### But if `.` matches any character, how do you match the actual character `.`? You need to use an .yellow[escape] to tell the regular expression you want to match it exactly, not use its special behaviour. Represented by two `\\` back slashes or square brackets `[ ]`.
+
+
+```r
+str_view(c("abc", "a.c", "bef"), "a\\.c")
+```
+
+<div id="htmlwidget-2ad5b833019b29bda12a" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2ad5b833019b29bda12a">{"x":{"html":"<ul>\n  <li>abc<\/li>\n  <li><span class='match'>a.c<\/span><\/li>\n  <li>bef<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+```r
+str_view(c("abc", "a.c", "bef"), "a[.]c")
+```
+
+<div id="htmlwidget-f46cd8b7f9dac333417a" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f46cd8b7f9dac333417a">{"x":{"html":"<ul>\n  <li>abc<\/li>\n  <li><span class='match'>a.c<\/span><\/li>\n  <li>bef<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+---
+
+class: split-two bg-gray black
+
+.column[.content[
+# Regex
+
+## Anchors
+
+### By default, regular expressions will match any part of a string. It’s often useful to anchor the regular expression so that it matches from the start or end of the string. You can use:
+
+    `^` to match the start of the string.
+    `$` to match the end of the string.
+
+
+
+```r
+str_view(x, "^a")
+```
+
+<div id="htmlwidget-1a1278cd0809ec6da8b6" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1a1278cd0809ec6da8b6">{"x":{"html":"<ul>\n  <li><span class='match'>a<\/span>pple<\/li>\n  <li>banana<\/li>\n  <li>pear<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+
+```r
+str_view(x, "a$")
+```
+
+<div id="htmlwidget-919c9ddef2aad88249a1" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-919c9ddef2aad88249a1">{"x":{"html":"<ul>\n  <li>apple<\/li>\n  <li>banan<span class='match'>a<\/span><\/li>\n  <li>pear<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]]
+.column[.content[
+
+## More Examples:
+
+
+```r
+x &lt;- c("apple pie", "apple", "apple cake")
+str_view(x, "apple")
+```
+
+<div id="htmlwidget-117173357685ecab1253" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-117173357685ecab1253">{"x":{"html":"<ul>\n  <li><span class='match'>apple<\/span> pie<\/li>\n  <li><span class='match'>apple<\/span><\/li>\n  <li><span class='match'>apple<\/span> cake<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+### Only match the whole word 
+
+
+```r
+str_view(x, "^apple$")
+```
+
+<div id="htmlwidget-c3b434bb748adcea637b" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c3b434bb748adcea637b">{"x":{"html":"<ul>\n  <li>apple pie<\/li>\n  <li><span class='match'>apple<\/span><\/li>\n  <li>apple cake<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]]
+
+---
+
+class: bg-gray black
+
+# Regex
+
+## Character Classes
+
+### There are a number of special patterns that match more than one character. You’ve already seen ., which matches any character apart from a newline. There are four other useful tools:
+
+    \d: matches any digit.
+    \s: matches any whitespace (e.g. space, tab, newline).
+    [abc]: matches a, b, or c.
+    [^abc]: matches anything except a, b, or c.
+
+## str_replace
+
+### Replace all vowels with '-'
+
+
+```r
+x &lt;- c("apple", "pear", "banana")
+str_replace(x, "[aeiou]", "-")
+```
+
+```
+## [1] "-pple"  "p-ar"   "b-nana"
+```
+
+For thorough documentation on regex and stringr review the R for Data Science Handbook: https://r4ds.had.co.nz/strings.html
+
+---
+class: bg-gray black
+
+# Lists
+
+### Lists are the next step up from named vectors. Lists can contain other lists
+
+
+```r
+x &lt;- list(1, 2, 3)
+x
+```
+
+```
+## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 2
+## 
+## [[3]]
+## [1] 3
+```
+
+### We can combine multiple data sets into a list, as we'll see in the exercises
+
+---
+class: bg-gray black
+
+#Lists
+
+
+```r
+x1 &lt;- list(c(1, 2), c(3, 4))
+x2 &lt;- list(list(1, 2), list(3, 4))
+x3 &lt;- list(1, list(2, list(3)))
+```
+
+&lt;img src = 'https://d33wubrfki0l68.cloudfront.net/5ba72e78f2df8568c1be82236659558b0e06904c/04521/diagrams/lists-structure.png'&gt;
+
+### There are three principles:
+
+### Lists have rounded corners. Atomic vectors have square corners.
+
+### Children are drawn inside their parent, and have a slightly darker background to make it easier to see the hierarchy.
+
+### The orientation of the children (i.e. rows or columns) isn’t important, so I’ll pick a row or column orientation to either save space or illustrate an important property in the example.
+
+---
+class: split-two bg-gray black
+
+.column[.content[
+#Purrr
+
+### Works well with lists for applying a function to everything in a given list
+### `map` replaces .green[for loops] in code and is succinct and easier to read.
+
+
+```r
+df &lt;- tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+```
+
+Say we wanted the `median` of each:
+
+
+```r
+median(df$a)
+```
+
+```
+## [1] 0.4475318
+```
+
+```r
+median(df$b)
+```
+
+```
+## [1] -0.2774636
+```
+
+```r
+median(df$c)
+```
+
+```
+## [1] -0.2070178
+```
+
+```r
+median(df$d)
+```
+
+```
+## [1] 0.4877806
+```
+
+]]
+
+.column[.content[
+
+# Using `map`
+
+
+```r
+map_dbl(df, median)
+```
+
+```
+##          a          b          c          d 
+##  0.4475318 -0.2774636 -0.2070178  0.4877806
+```
+
+]]
+---
+class: bg-main1
+
+#Exercises:
+
+#Focus on Regex, splitting, combining data
+# Working with lists and purrr 
+# Working with Dates
+
+
+---
+class: middle center bg-main1
+
+#Data Management in R 
+##Session 3
+###July 21st, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Course website](http://www.mapdatascience.com/Data-Management)
+### <span>&lt;i class="fas  fa-laptop faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Google Drive](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+###<span>&lt;i class="fas  fa-chevron-right faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>Review: Week_2_Practice_01.Rmd and Week_2_Practice_02.rmd
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+
+
+&lt;/div&gt;
+
+---
+
+#References
+
+Portions of this material are derived from:
+
+RStudio's 'Learning Tidyverse'
+
+[Data Carpentry](http://swcarpentry.github.io) [datasciencebox.org](https://datasciencebox.org)
+
+Estrellado, R. A., Bovee, E. A., Motsipak, J., Rosenberg, J. M., &amp; Velásquez, I. C. (in press). Data science in education using R. London, England: Routledge. Nb. All authors contributed equally
+
+https://stat545.com/
+
+https://r4ds.had.co.nz/
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"countIncrementalSlides": false,
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
