@@ -41,7 +41,7 @@ Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l
 
 [Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_3.html)
 
-[Recorded Session 3]()*requires a login 
+[Recorded Session 3](https://attendee.gotowebinar.com/recording/6336684930906356738)*requires a login 
 
 Download Exercises:
 
