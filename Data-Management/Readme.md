@@ -39,7 +39,7 @@ Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l
 
 # Session 3:
 
-[Session 2 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_3.html)
+[Session 3 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_3.html)
 
 [Recorded Session 3](https://attendee.gotowebinar.com/recording/6336684930906356738)*requires a login 
 
@@ -53,6 +53,25 @@ Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l
 
 **Contact**: lauren@mapdatascience.com 
 
+# Session 4:
+
+[Session 4 Presentation](http://www.mapdatascience.com/Data-Management/Presentation/PopData_Session_4.html)
+
+[Recorded Session 4]()*requires a login 
+
+Download Exercises:
+
+**Week_2_Practice_02A.rmd**
+**Week_2_Practice_03.rmd**
+- .html and .word on google drive
+**Storyboard_02.rmd**
+- .html on google drive
+
+**Date_Management_Github_Setup.rmd**
+
+Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+**Contact**: lauren@mapdatascience.com 
 
 Session 1:
 
