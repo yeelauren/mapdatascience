@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>PopData_Session_4</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lauren" />
+    <meta name="date" content="2020-11-06" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome/js/fontawesome-all.min.js"></script>
+    <link rel="stylesheet" href="style-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: middle center bg-main1
+
+#Data Management in R 
+##Session 4
+###July 23rd, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Course website](http://www.mapdatascience.com/Data-Management)
+### <span>&lt;i class="fas  fa-laptop faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Google Drive](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+###<span>&lt;i class="fas  fa-chevron-right faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>Review: Week_2_Practice_03.Rmd, Storyboard_02.rmd, Data_Management_Github_Setup.rmd
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+
+
+&lt;/div&gt;
+
+---
+
+class:  bg-main1
+
+.content[
+# Note from last class:
+
+## Creating functions with tidyverse :
+
+https://cran.r-project.org/web/packages/dplyr/vignettes/programming.html
+
+## Creating slides in R Markdown:
+
+https://rmarkdown.rstudio.com/lesson-11.html
+
+
+### These slides are built with `xaringan`, themes `kunoichi` 
+
+https://bookdown.org/yihui/rmarkdown/xaringan.html
+
+https://slides.yihui.org/xaringan/#1
+
+https://bookdown.org/yihui/rmarkdown/xaringan-format.html
+
+## R things to follow:
+
+### #Rstats on twitter, updates, questions
+### [Awesome list of packages](https://github.com/qinwf/awesome-R/blob/master/README.md)
+
+]
+
+---
+class: bg-main1
+
+.content[
+
+# Groups to check out:
+
+## ROpenSci
+
+https://ropensci.org/
+
+&gt;rOpenSci fosters a culture that values open and reproducible research using shared data and reusable software.
+
+## R-Ladies 
+
+ https://rladies.org/
+
+&gt; Organize meet-ups, workshops and networking for minority genders
+
+## Recon - R Epidemics Consortium
+
+### https://www.repidemicsconsortium.org/
+
+&gt;The R Epidemics Consortium (RECON) is an international not-for-profit, non-governmental organisation gathering experts in data science, modelling methodology, public health, and software development to create the next generation of analytics tools for informing the response to disease outbreaks, health emergencies and humanitarian crises, using the R software and other free, open-source resources.
+
+
+
+]
+
+
+---
+class: middle center bg-deep-purple
+
+# Markdown Documents
+# Embedding tables / plots
+# Version Control
+
+&lt;img src="./Figures/R_markdown.png" width="40%" height="40%"  /&gt;
+---
+class: hide-slide-number
+background-image: url("./Figures/markdown_flow.png")
+
+
+---
+class: bg-main1
+
+# Logistics
+
+## .yellow[Knitr] runs the document in a fresh R session, which means you need to load the libraries that the document uses in the document
+
+## Objects made in one code chunk will be available to code in later .green[code chunks]
+
+## Multilingual!
+
+---
+class: bg-main2
+
+# Headers
+
+## Use # to create headers. 
+## Multiple #’s create lower level headers.
+
+.img.fill[![](./Figures/headers.PNG)]
+
+---
+class: bg-main1
+
+# Text
+
+### Text is rendered as plain text. Surround text with _, **, or ` to format it.
+
+&lt;img src ="./Figures/text.PNG"&gt;
+
+---
+class: bg-main1
+
+# Bullets, numbered items
+
+### Use asterisks to make bullet points.
+### Use numbers to make numbered lists.
+
+&lt;img src="./Figures/bullets.png"&gt;
+
+---
+class: bg-main1
+
+# Hyperlinks
+
+### Use brackets to denote a link. Place the URL in parentheses.
+
+&lt;img src="./Figures/links.png"&gt;
+
+---
+class: bg-main1
+
+# Images
+
+### Use a link preceded by an ! to insert an image. 
+### The link text should be a URL (if the image is hosted online), or a file path (if the image is saved as a file)
+
+###Can also use .green[html!]
+
+&lt;img src="./Figures/images.png"&gt;
+
+---
+class: bg-main1
+
+# Equations
+
+###Write equations with latex math commands and surround them in $’s.
+
+&lt;img src = "./Figures/equations.png"&gt;
+
+
+---
+class: middle center bg-main1
+
+# IDE Reference
+
+### Help &gt; Markdown Quick Reference
+
+
+---
+class: bg-main1
+
+# Code Chunks
+
+### Insert a chunk of R code with
+
+&lt;img src = "./Figures/chunks.PNG"&gt;
+
+---
+class: bg-main1
+
+# Code Chunks
+
+### By default, R Markdown includes both the code and its results
+
+&lt;img src = "./Figures/chunk_default.PNG"&gt;
+
+---
+
+
+class: bg-main1
+
+# Code Chunks
+
+### Add options in the brackets after r. echo = FALSE .yellow[hides] the code.
+
+### Very useful for plots!
+
+&lt;img src = "./Figures/chunk_echo.PNG"&gt;
+
+---
+
+class: bg-main1
+
+# Code Chunks
+
+### eval = FALSE prevents the code from being run. As a result, no results will be displayed with the code.
+
+### Very useful for plots!
+
+&lt;img src = "./Figures/chunks_eval.PNG"&gt;
+
+---
+class: bg-main1
+
+# Code Chunks
+
+### include = FALSE runs the code, but prevents both the code and the results from appearing (e.g. to setup).
+
+&lt;img src = "./Figures/chunks_include.PNG"&gt;
+
+---
+
+# Figures
+
+## In chunks you can specify the size of the output (in inches) with fig.width and fig.height. 
+## Separate multiple arguments with commas
+
+&lt;img src = "./Figures/chunks_figs.PNG"&gt;
+
+---
+class: bg-main1
+
+# Inline code
+
+### Place code in a sentence
+## R Markdown will replace the code with its results.
+
+&lt;img src = "./Figures/inline.PNG"&gt;
+
+---
+
+class: bg-main2
+
+# Markdown
+All R markdown documents end in **.rmd** as opposed to **.R**. The start of a markdown file is called a "YAML". Here you can specify the title and other meta data attributes to your file, as well as the outputs generated. Such as a pdf, word file, or html document
+
+&lt;img src='./Figures/markdown.png'&gt;
+
+---
+class: bg-main1
+
+# YAML
+
+## A section of key:value pairs
+##  Separated by dashed lines ----
+
+&lt;img src = "./Figures/YAML.PNG"&gt;
+
+---
+class: bg-main2
+
+# Lastly... it wouldn't be R if there wasn't already a package for it:
+
+## [DataExploreR](https://cran.r-project.org/web/packages/DataExplorer/vignettes/dataexplorer-intro.html) A package that preforms exploratory analysis for you
+
+---
+class: middle center bg-main1
+
+##<span>&lt;i class="fas  fa-chevron-right faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>Review: Week_2_Practice_02A.Rmd Week_2_Practice_03.Rmd and Storyboard_02.rmd 
+
+##<span>&lt;i class="fas  fa-chevron-up faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> Feel free to send me or upload to github your exploratory analysis/analysis markdown(s). 
+
+## Will upload an answer key Friday afternoon (EST) for reference.
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+
+
+&lt;/div&gt;
+
+
+---
+class: middle center bg-main1
+
+#Data Management in R 
+##Session 4
+###July 23rd, 2020
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Course website](http://www.mapdatascience.com/Data-Management)
+### <span>&lt;i class="fas  fa-laptop faa-passing animated animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span> [Google Drive](https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l?usp=sharing)
+
+
+&lt;div style="position: absolute;top:0px; right:0px;"&gt;
+&lt;img src="./pop_data.png"&gt;
+
+
+&lt;/div&gt;
+
+---
+
+#References
+
+Portions of this material are derived from:
+
+RStudio's 'Learning Tidyverse'
+
+[Data Carpentry](http://swcarpentry.github.io) [datasciencebox.org](https://datasciencebox.org)
+
+Estrellado, R. A., Bovee, E. A., Motsipak, J., Rosenberg, J. M., &amp; Velásquez, I. C. (in press). Data science in education using R. London, England: Routledge. Nb. All authors contributed equally
+
+https://stat545.com/
+
+https://r4ds.had.co.nz/
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"countIncrementalSlides": false,
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
