@@ -62,9 +62,13 @@ Go to: [https://drive.google.com/drive/folders/1twc2Leu-ZKRQmJQVvHXACTNS65mo4S8l
 Download Exercises:
 
 **Week_2_Practice_02A.rmd**
+
 **Week_2_Practice_03.rmd**
+
 - .html and .word on google drive
+
 **Storyboard_02.rmd**
+
 - .html on google drive
 
 **Date_Management_Github_Setup.rmd**
