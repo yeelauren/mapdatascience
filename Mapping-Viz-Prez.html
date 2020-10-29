@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Making Maps in R</title>
+    <meta charset="utf-8" />
+    <link href="libs/remark-css-0.0.1/kunoichi.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <link href="libs/font-awesome-5.0.12/css/fontawesome-all.min.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+    <script src="libs/jquery-1.12.4/jquery.min.js"></script>
+    <link href="libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-1.3.1/leaflet.js"></script>
+    <link href="libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+    <script src="libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+    <script src="libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding-2.0.3/leaflet.js"></script>
+    <script src="libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+    <script src="libs/leaflet-providers-plugin-2.0.3/leaflet-providers-plugin.js"></script>
+    <link rel="stylesheet" href="customcss.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: middle center bg-main1
+# Making Maps in R
+## Quick introduction to tmap
+###  Lauren Yee
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>[Website](http://www.mapdatascience.com/)
+### Guest Lecture UofT 2020/10/29
+---
+class: bg-main1
+# About me
+
+##**Lauren Yee** is multifaceted researcher and data scientist. She currently works in the consulting industry, teaching and designs projects around data visualization, dashboards and ecological, spatial analysis, studied emerging infectious zoonoses and spatial epidemiology.
+
+---
+class: bg-main1 white
+
+# Overview
+
+## Quick intro to data visualization
+
+## Introduce tmap package in R for creating various map types
+
+## Visualize Coronavirus cases by Toronto Neighbourhood
+
+## Customize icons in maps
+
+## For a more indepth explanation of these topics please check out the *free* textbook [Geocomputation with R](https://geocompr.robinlovelace.net/)
+
+---
+class: bg-main1 white
+
+#Data Visualization
+
+##- Communicate complex information, spot patterns and to tell a story
+--
+
+##- Human are .blue[perceptive] at viewing and processing visual information for large amounts of data 
+
+--
+
+##- Text and tables can be overwhelming and patterns are undetected
+
+--
+
+##- Core component of Exploratory Data Analysis
+
+--
+
+##- Step taken before modelling or interpreting data
+
+--
+
+##- Highlight useful information and trends
+
+--
+
+##- Charts/graphs, infographics and maps
+
+
+---
+
+# Data Visualization 
+
+&lt;div class="blue"&gt;
+.center[.content[
+.content-box-purple[
+### What question needs to be answered?
+
+###Who is your intended audience ?
+
+### What are you trying to show ?
+
+### How can a visualization show this or make relationships more clear?
+]
+
+]]
+
+
+
+&lt;img src="images/environmental-data-science-r4ds-general.png" width="75%" style="display: block; margin: auto;" /&gt;
+---
+class: bg-main1
+
+# Bad Visualizations
+
+--
+##  **Too** much information :  **too** much colour, **too** much to interpret, **too** many figures/data/labels on one plot
+
+--
+
+##  At first .blue[glance] you cannot interpret the figure without help
+--
+
+##   What is the point?
+--
+
+##   Visualizations that are misleading
+--
+
+  ### -  cutting off data values
+      
+  ### -  bad scale or adjusted scales
+    
+  ### -  hiding or removing outliers when they may be important to the analysis
+
+--
+
+---
+class: middle center
+#Lying with Maps 
+
+
+.blockquote[<i class="fas  fa-comment-dots "></i>
+
+Not only is it easy to lie with maps, it's essential. To portray
+meaningful relationships for a complex, three-dimensional
+world on a flat sheet of paper or a video screen, a map must
+distort reality. As a scale model, the map must use symbols
+that almost always are proportionally much bigger or thicker
+than the features they represent. To avoid hiding critical information in a fog of detail, the map must offer a selective, incomplete view of reality. There's no escape from the cartographic paradox: to present a useful and truthful picture, an accurate map must tell white lies.
+
+.right[-- &lt;cite&gt;How to lie with Maps by Mark Monmonier &lt;/cite&gt;]
+]
+---
+#Lying with Maps
+
+## Single snapshot in time, can be difficult to interpret, not always the best tool
+
+## This is changing with R, facets, animation and interactive maps
+
+## Maps can be distorted
+
+## Other underlying .red[spatial patterns (e.g. population density, vacant land, rivers, lakes)]
+
+## .blue[Is this map showing where people live or a trend in the data?]
+
+.footer[See: https://www.futurehealth.live/blog/2020/2/17/all-the-coronavirus-maps-are-wrong]
+
+
+---
+
+&lt;img src="./images/terrible_map.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="./images/tweet-1.png" width="60%" height="65%" style="display: block; margin: auto;" /&gt;
+https://twitter.com/EmeraldRobinson/status/1305592306851098625
+
+---
+&lt;img src="./images/tweet-2.png" width="60%" style="display: block; margin: auto;" /&gt;
+https://twitter.com/holden/status/1305188576464830464
+---
+
+&lt;img src="./images/tweet-3.png" width="60%" style="display: block; margin: auto;" /&gt;
+https://twitter.com/CT_Bergstrom/status/1305626254247251968?s=09
+---
+#The Good
+
+&lt;img src="./images/john_snow.png" width="70%" height="50%" style="display: block; margin: auto;" /&gt;
+
+John Snow, 1854
+---
+
+&lt;img src="./images/bill_rankin.jpg" width="100%" style="display: block; margin: auto;" /&gt;
+
+Source: Bill Rankin
+
+---
+class: split-two 
+
+
+.column.bg-main1[.content[
+# Mapping Software
+
+## ArgGIS, QGIS , GRASS
+
+
+### - dedicated desktop geographic information systems (GIS) software to analyze and visualize spatial data
+
+
+### - friendily software GUI
+
+&lt;img src="./images/r_rollercoaster.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+]]
+
+.column.bg-main3[.content[
+# Introducing R
+
+### - increasing visualization options, community of people and packages for niche environmental and scientific methods &lt;/br&gt;
+### - .purple[steep learning curve], visualizations of spatial data often cumbersome, although getting better!
+&lt;/br&gt;
+### - the R package **tmap** aims to solve the issues of learning curve and bad visualizations by creating a simple language
+&lt;/br&gt;
+
+### - great community of support through community groups like RLadies, RStats and RSpatial
+
+]]
+
+---
+class: bg-main3
+
+# Why maps in R ?
+
+--
+
+- ## Reproducible
+
+--
+
+- ## Fast
+
+--
+
+- ## Automatically generates elements in white space
+
+--
+
+- ## Less clicking
+
+--
+
+- ## Embed plots/maps, tables in RMarkdown for report generation
+
+---
+class: split-70 hide-slide-number
+background-image: url("images/tmap_ex.png")
+background-size: cover
+
+.column.slide-in-left[
+.sliderbox.vmiddle.shade_main.center[
+.font5[Tmap]]]
+.column[
+]
+
+---
+
+class:bg-main1
+
+#Tmap: thematic maps in R
+
+### A thematic map is a visualization where statistical information with a spatial component is shown
+
+### The aim of the tmap package is to provide R users with an elegant and flexible way to make thematic maps, requiring a minimum amount of code
+
+### Based on a `layered grammar` similar to ggplot2 but specifically for maps uses `+` to build layers
+
+
+### Thematic maps are created by stacking layers where per layer data can be mapped to one or more *aesthetics*
+
+### Works with `sp` and `sf` objects and `raster` packages
+
+### Layout is optimized (legends, north arrow, grids, scale bar)
+
+
+.footnote[Layered Grammar http://vita.had.co.toronto/papers/layered-grammar.pdf]
+
+.footnote[http://github.com/mtennekes/tmap]
+
+
+---
+
+# Mapping Coronavirus by Neighbourhood 
+
+### Toronto's open data portal contains coronavirus .orange[cases] over time by .green[neighbourhood].
+### I've provided an tmap-toronto-corona.rmd for your reference which you can use to follow along or examine on your own
+
+
+
+&lt;div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:70%; overflow-x: scroll; width:100%; "&gt;&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; X_id &lt;/th&gt;
+   &lt;th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"&gt; Assigned_ID &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Outbreak.Associated &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Age.Group &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Neighbourhood.Name &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; FSA &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Source.of.Infection &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Classification &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Episode.Date &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Reported.Date &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Client.Gender &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Outcome &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Currently.Hospitalized &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Currently.in.ICU &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Currently.Intubated &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Ever.Hospitalized &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Ever.in.ICU &lt;/th&gt;
+   &lt;th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"&gt; Ever.Intubated &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 219395 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sporadic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 to 59 Years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Willowdale East &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M2N &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Travel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CONFIRMED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22-01-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 23-01-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RESOLVED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 219396 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sporadic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 to 59 Years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Willowdale East &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M2N &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Travel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CONFIRMED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 21-01-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 23-01-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RESOLVED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 219397 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sporadic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 20 to 29 Years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Parkwoods-Donalda &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M3A &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Travel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CONFIRMED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 05-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 21-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RESOLVED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 219398 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sporadic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 60 to 69 Years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Church-Yonge Corridor &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M4W &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Travel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CONFIRMED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 16-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RESOLVED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 219399 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sporadic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 60 to 69 Years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Church-Yonge Corridor &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M4W &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Travel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CONFIRMED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 20-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 26-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RESOLVED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 219400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Sporadic &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 to 59 Years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Newtonbrook West &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M2R &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Travel &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CONFIRMED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 24-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 27-02-2020 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RESOLVED &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; No &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+---
+# Disclaimer
+
+This data is based solely on COVID-19 cases and does not consider, population, population density, multi-generational homes, long-term care, socioeconomics, access to care, unhoused populations or other factors that would impact the number of cases in a given neighbourhood.
+
+Please note, this tutorial serves as a basis for quickly illustrating how tmap works for a Guest Lecture at University of Toronto. It is not an exhaustive resource for interpreting public health data, as COVID-19-19 is still ongoing the data presented in this tutorial is taken as a snapshot in time from the beginning of October 2020. This data is subject to change and may differ from official data sources, as they remove duplicates and resolve data issues. There is only so much that can be interpreted from maps or visualizations alone and subject matter experts (epidemiologists, public health researchers, virologists, etc.) should always be consulted when examining public health data - especially in this climate.
+
+---
+
+class: split-main2
+
+.row[.content[
+### First use .orange[tm_shape] to define the shape objects, here .green[toronto] contains the shape of Toronto neighbourhoods
+]]
+
+.row[.content[
+.split-two[
+.column[.content[
+###.orange[tm_fill] defines how to display the layer as in **filled polygons**
+
+
+```r
+tm_shape(toronto) +
+  tm_fill() 
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/build-tmap-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+.footnote[Toronto Neighbourhoods from Toronto Open Data Portal(https://open.toronto.ca/dataset/neighbourhoods/)]
+
+]]
+.column[.content[
+
+###.orange[tm_borders()] assigns the default settings for a border to the .green[toronto] shape
+
+
+```r
+tm_shape(toronto) +
+  tm_borders() 
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/unnamed-chunk-5-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+]]
+]
+]
+]
+---
+class: split-main2
+
+.row[.content[
+.split-two[
+.column[.content[
+
+### Element functions have the prefix `tm_`, are stacked with the `+` operator.
+
+
+
+```r
+tm_shape(toronto) +
+* tm_fill() +
+* tm_borders()
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+]]
+.column[.content[
+
+```r
+tm_shape(toronto) +
+* tm_polygons("darkolivegreen3")
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+### Data variables are mapped to graphical variables, such as .purple[position], .yellow[size], .green[colour], and .blue[shape]. These graphical variables are called aesthetics. 
+]]
+]
+]]
+
+---
+
+## Aggregate by Neighbourhood
+
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; AREA_NAME &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Neighbourhood.Name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; n &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Agincourt North (129) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Agincourt North &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 126 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Agincourt South-Malvern West (128) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Agincourt South-Malvern West &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alderwood (20) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Alderwood &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 62 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Annex (95) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Annex &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 173 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Banbury-Don Mills (42) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Banbury-Don Mills &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bathurst Manor (34) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Bathurst Manor &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 161 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+class: split-two bg-main1
+
+.column[.content[
+## Create Choropleth:
+
+### Where "n" is number of cases: 
+### We want to map the shape of the neighbourhoods `neighbourhood_covid` and show the differences in the total number of cases `n` by using `tm_fill`.
+
+###We can add a white border with a line width `lwd = 0.5` of 0.5.
+
+
+```r
+tm_shape(neighbourhood_covid) +
+* tm_fill("n")+
+* tm_borders("white", lwd=0.5)
+```
+]]
+.column[.content[
+&lt;img src="Figures/tmap-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+]]
+---
+
+class: split-two black
+
+
+.column.bg-main1[.content[
+
+# Colour
+
+###**Sequential** : Great for low to high values go from light colours to darker 
+
+###**Diverging**: highlight differences e.g. standard deviation 
+
+
+###**Qualitative**: Used to present categorical data, soil types, type of neighbourhood
+
+#Colour Brewer
+
+### A great resource for choosing colour schemes that are colourblind friendly and aesthetically pleasing is ColorBrewer 2.0 http://colorbrewer2.org/
+
+### Two libraries in R `viridis` and `RColorbrewer`
+
+    ]
+      ]
+  .column[.content[
+&lt;img src="./images/sequential.png" width="25%" style="display: block; margin: auto;" /&gt;&lt;img src="./images/diverging.png" width="25%" style="display: block; margin: auto;" /&gt;&lt;img src="./images/qualitative.png" width="25%" style="display: block; margin: auto;" /&gt;
+  ]]
+
+---
+&lt;img src="./images/colour_brewer.png" width="100%" /&gt;
+---
+class: split-two 
+
+.column[.content[
+
+# Colour Blindness
+
+&lt;img src="./images/colour_scale.png" width="75%" style="display: block; margin: auto;" /&gt;
+  
+  .footnote[Source: Viridis Colour Scales (Green-Blind (Deuteranopia))]
+  ]
+  ]
+
+.column[.content[
+
+## Check the accessibility of your colours
+
+&lt;img src="./images/cb2.png" width="75%" style="display: block; margin: auto;" /&gt;
+]]
+  
+
+---
+class: bg-main3
+
+# Choose Colour Brewer in Tmap
+
+`brewer.pal` refers to the palettes contained in `library(RColorBrewer)`
+
+Use the .green[green] colour scale with `six` different breaks
+
+
+```r
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",
+*         palette = brewer.pal("Greens", n = 6)) +
+  tm_borders("black", lwd=0.5)
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/tmap palette-1.png" width="60%" height="50%" style="display: block; margin: auto;" /&gt;
+---
+
+class: split-three
+
+
+.row[.content[
+# Class Intervals
+
+## How values are grouped and displayed on a map
+
+]]
+
+.row[.content[
+.split-three[
+.column[.content[
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/map_e-1.png" width="90%" /&gt;
+
+]]
+.column[.content[
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/map_j-1.png" width="90%" /&gt;
+]]
+
+.column[.content[
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/map_q-1.png" width="90%" /&gt;
+]
+]
+]]
+]
+---
+
+class: split-two
+.column[.content[
+
+#Equal Interval
+
+Equal Interval scheme breaks up the range of values into equal interval widths. 
+
+116 between intervals
+&lt;img src="Mapping-Viz-Prez_files/figure-html/ggplot equal-1.png" width="75%" height="50%" style="display: block; margin: auto;" /&gt;
+
+]]
+
+.column[.content[
+
+
+```r
+tm_shape(neighbourhood_covid) +
+  tm_fill("n", style ="equal", palette = "YlOrRd")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(main.title = "Equal Interval", inner.margins = c(0, 0, 0, 0))
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/tmap equal-1.png" width="75%" height="75%" style="display: block; margin: auto;" /&gt;
+
+
+]]
+
+---
+
+class: split-two
+.column[.content[
+#Jenks
+
+Jenks scheme (aka natural breaks) uses an algorithm that identifies clusters in the dataset. The number of clusters is defined by the desired number of intervals.
+&lt;img src="Mapping-Viz-Prez_files/figure-html/jenks plot-1.png" width="75%" height="50%" style="display: block; margin: auto;" /&gt;
+
+
+]]
+.column[.content[
+
+```r
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",style="jenks",palette="YlOrRd")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(main.title = "Natural Jenks", inner.margins = c(0, 0, 0, 0))
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/jenks tmap-1.png" width="75%" height="75%" style="display: block; margin: auto;" /&gt;
+]]
+
+
+---
+class: split-two
+
+.column[.content[
+#Quantile
+
+ Quantile Interval scheme ensures that each color swatch is represented an equal number of times. If we have 20 polygons and 5 classes, the interval breaks will be such that each color is assigned to 4 different polygons.
+ 
+ In this case, only 28 polygons can be within a given class, with 5 different classes.
+&lt;img src="Mapping-Viz-Prez_files/figure-html/ggplot2 quantile-1.png" width="75%" height="50%" style="display: block; margin: auto;" /&gt;
+]]
+
+.column[.content[
+
+```r
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",style="quantile",palette="YlOrRd")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(main.title = "Quantile Breaks", inner.margins = c(0, 0, 0, 0))
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/tmap quantile-1.png" width="75%" height="75%" style="display: block; margin: auto;" /&gt;
+
+]]
+
+
+---
+class: bg-main3
+# Add Histogram to Map
+
+Turn on the histogram `legend.hist = T`
+
+Put the legend outside the main map `tm_legend(outside = TRUE` and change the width of the histogram `hist.width=2`
+
+Finally adjust the relative font size for the choropleth histogram
+
+
+```r
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",palette = brewer.pal("Greens", n = 6),
+*         legend.hist = T)+
+  tm_borders("black", lwd=0.5)+
+* tm_legend(outside = TRUE, hist.width=2) +
+* tm_layout(legend.hist.size = 0.5)
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/tmap_histo-1.png" width="40%" height="40%" style="display: block; margin: auto;" /&gt;
+
+---
+class: split-two bg-main1 
+
+.column[.content[
+
+# Proportional Symbols
+
+Use `tm_dots` for proportional symbols
+
+
+```r
+tm_shape(neighbourhood_covid)+
+* tm_dots(size="n")+
+  tm_borders("black", lwd=0.5)
+```
+]]
+
+.column[.content[
+&lt;img src="Figures/unnamed-chunk-4-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+]]
+
+
+---
+class: split-two bg-main1
+
+.row[.content[
+.split-two[
+  .column[
+
+# Add other map elements
+
+### scale bar : `tm_scale_bar`
+
+### compass : `tm_compass`
+
+### main title `main.title`
+
+### Must be in projected coordinate system*
+
+
+```r
+#Project
+neighbourhood_covid&lt;-st_transform(neighbourhood_covid,2958)
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",palette = brewer.pal("Greens", n = 6))+
+  tm_borders("black", lwd=0.5)+
+* tm_scale_bar(width = 0.22) +
+* tm_compass(position = c(0.85,0.4)) +
+* tm_layout(main.title = "Total Positive Covid Cases by Neighbourhood", bg.color = "lightgrey",
+*           inner.margins = c(0, 0, 0, 0),
+*           frame.lwd = 5, title.size = 1)
+```
+  ]
+  .column[
+&lt;img src="Figures/tmap elements-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+  ]
+]
+]]
+
+---
+
+class: split-two bg-main1
+
+.column[.content[
+## More than 500 cases
+
+### If we wanted to show the neighbourhoods that have more than 500 cases:
+
+### First we can subset the data :
+
+
+```r
+over_500&lt;-neighbourhood_covid %&gt;%
+  filter(n&gt;500)
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("white")+
+  tm_borders("grey", lwd=0.5)+
+tm_shape(over_500)+
+    tm_fill("lightblue")+
+    tm_borders("black")+
+*   tm_text("Neighbourhood.Name", just="left", xmod=0.5, size=0.8, bg.color = "white", remove.overlap = TRUE)+
+  tm_layout(main.title = "Top 5 Neighbourhoods for Covid Cases", inner.margins = c(0, 0, 0, 0))
+```
+
+  ]]
+  
+.column[.content[
+
+&lt;img src="Figures/tmap_subset-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+  ]
+]
+
+
+---
+class: split-two bg-main3
+
+.row[.content[
+.split-two[
+  .column[
+  # Add basemaps
+
+###Using library `rosm`. 
+
+###`osm.raster` will download tiles directly to your computer (may take some time) based on the square boundary or  around Toronto. 
+
+###`Type` changes the type of basemap to download while crop, crops the basemap to the bbox extent.
+
+
+```r
+library(rosm)
+bg &lt;- osm.raster(st_bbox(toronto),crop=TRUE)
+
+tm_shape(bg)+
+  tm_rgb()+
+tm_shape(toronto)+
+  tm_borders()
+```
+
+  ]
+  .column[
+&lt;img src="Figures/tmap basemap-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+  ]
+  ]
+]
+]
+
+---
+class: split-two bg-main3
+
+.column[.content[
+# Add basemaps
+
+### Notice the difference when `crop=TRUE` in previous slide
+### Multiple `types` of basemaps available
+
+```r
+bg_hotstyle&lt;-osm.raster(st_bbox(toronto), type="hotstyle")
+
+tm_shape(bg_hotstyle)+
+  tm_rgb()+
+tm_shape(toronto)+
+  tm_borders(col = "black")+
+  tm_style("classic")
+```
+
+]]
+
+.column[.content.bg-white[
+
+&lt;img src="Figures/tmap basemap-2.png" width="75%" style="display: block; margin: auto;" /&gt;
+]]
+
+---
+class: bg-main1
+# tmap contains two modes:
+
+## plot: static maps, shown in graphics device window; can be exported to png, jpg, pdf, etc.
+
+##`tmap_mode("plot")`
+
+##view: interactive maps, shown in the viewing window or in the browser; can be exported to standalone HTML files
+
+##`tmap_mode("view")`
+
+---
+#Create Map with Custom Icons <span class=" faa-flash animated " style=" display: -moz-inline-stack; display: inline-block; transform: rotate(0deg);">&lt;img src="./Images/noun_virus_3364091.png" style="height:1em; width:auto; "/&gt;</span>
+
+### This icon is from the noun project (https://thenounproject.com/search/?q=corona)
+### Can only use in .green[view] mode
+### Define cv as .deep-orange[tmap_icon]
+### Apply the icon as a .blue[tmap_symbols] 
+
+
+```r
+cv &lt;- tmap_icons('./Images/noun_virus_3364091.png')
+current.mode &lt;- tmap_mode("view")
+
+tm_shape(neighbourhood_covid) +
+  tm_symbols(shape=cv, size = "n")
+```
+
+<div id="htmlwidget-f0e01808209cac3b205b" style="width:75%;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f0e01808209cac3b205b">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["Esri.WorldGrayCanvas",null,"Esri.WorldGrayCanvas",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldTopoMap",null,"Esri.WorldTopoMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addMarkers","args":[[43.716186340057,43.7456360675304,43.746868845462,43.7332916636781,43.7657375028493,43.6334652609189,43.6338811856793,43.7027159922861,43.7667414233476,43.6989928893053,43.8212018181319,43.7648904313434,43.8036585464682,43.7858301659117,43.7146721376041,43.6565176873478,43.6366987914293,43.778813908732,43.6881440214319,43.7135928005639,43.669623415853,43.7203454543396,43.7823992715918,43.7044354914627,43.6946833521679,43.7013260830022,43.7434295823562,43.683644511203,43.6159234708703,43.6922331170404,43.760367887462,43.7592755876983,43.6366810643109,43.6596495228238,43.7155740916781,43.6747904327778,43.758919442511,43.7237260163131,43.6715852543191,43.715929771036,43.7674899690483,43.7648142953607,43.7488294327872,43.7409221849501,43.7077493056634,43.6656767472771,43.6535541476723,43.6885658626477,43.7957163599395,43.7116093126134,43.6450629174529,43.7550340181626,43.7386522654944,43.7379878531867,43.6708866860238,43.7175150189271,43.725555961174,43.7968021489424,43.6932162953652,43.7801301290248,43.721519287414,43.6475359789167,43.8054405910153,43.699024246785,43.7314878021192,43.7485743584414,43.7711436928565,43.6580174068817,43.770602894724,43.6005888544925,43.6450643766659,43.6949982645072,43.7284897132283,43.6769192932697,43.6575120719749,43.7068003464509,43.7832939632286,43.7419790282387,43.6857274710842,43.6974083146698,43.6355183645699,43.6554282979401,43.7886570419003,43.6776609058301,43.8029880288457,43.650176311404,43.6575647698593,43.7211221389359,43.667889908375,43.7712104054482,43.8129587076134,43.7376576809818,43.8206902848062,43.6739621830178,43.6676477791833,43.7907747301372,43.6461231708811,43.776360995136,43.6797004164728,43.6049371514026,43.7542717517511,43.6885687479937,43.6599921668115,43.6492946576853,43.7353646995846,43.7042174734012,43.6591570793714,43.7869825424805,43.6841738775308,43.6894678548474,43.6828208049197,43.6625062228524,43.6726127931719,43.6535203908195,43.7172118841191,43.7823769131254,43.6818522575616,43.5923616750662,43.6335417944447,43.6660510388671,43.6913701525055,43.7048528347821,43.6878592504619,43.6888253980725,43.6710498645595,43.7037981245272,43.6967810786125,43.7562450996002,43.6945259904048,43.7915360722004,43.6719952036385,43.7046896440517,43.6574203262305,43.7300601044851,43.6592690753489,43.6840251828912,43.6767732425517,43.6941068774531,43.7310136839375,43.6761729314307],[-79.5963636708595,-79.5134659969816,-79.5872598037227,-79.4904936872242,-79.4888827018981,-79.5433162619024,-79.3772013718819,-79.5157229421893,-79.2285871205117,-79.5478629957836,-79.1863537697609,-79.5219795056757,-79.2225163577497,-79.4314212587459,-79.4571081976276,-79.3672972330139,-79.4393376794351,-79.4524188208643,-79.499989426539,-79.2813824783552,-79.3752465802192,-79.4374089129618,-79.2070411717018,-79.3933597239625,-79.2650892594508,-79.4855886221158,-79.5423672371099,-79.5542203584204,-79.5001350226641,-79.5224167901078,-79.2574015439556,-79.278908609166,-79.4124200710176,-79.3790177231774,-79.480757909438,-79.4944199448432,-79.5561737942477,-79.5662290533802,-79.4040000542741,-79.3326459332891,-79.1766757989614,-79.4560566091744,-79.1950542346729,-79.2455973491616,-79.3499838924601,-79.4385404186509,-79.3972398074527,-79.4397857645387,-79.3140835222548,-79.4980915097757,-79.5689391586507,-79.3301804913508,-79.216812606468,-79.5634914628161,-79.5224576881396,-79.5282834891909,-79.2603815809455,-79.3821178114277,-79.4794721972928,-79.3029178554612,-79.5489827844881,-79.4303229079337,-79.2667124416308,-79.4528508815866,-79.420226123065,-79.2986381752583,-79.3412404906433,-79.5804434184116,-79.4014836759117,-79.5103577304855,-79.4678719219011,-79.2959011290892,-79.3148744977337,-79.4255148632924,-79.3857218763669,-79.312227818524,-79.3536439788336,-79.4463024117435,-79.471437169129,-79.2797081701451,-79.5011284661349,-79.4373409369918,-79.265611406997,-79.4474694770281,-79.3548034388976,-79.415342112005,-79.4663019901252,-79.2355288828078,-79.4714399796211,-79.4275574610342,-79.3212064773521,-79.3497201826863,-79.2750074394914,-79.4602443213951,-79.3661065606488,-79.1774720173047,-79.4429929159415,-79.3771169674257,-79.3548871318499,-79.5416105755301,-79.4247472322017,-79.4552120785856,-79.3605087738367,-79.3356511324093,-79.2724703983659,-79.4281428559641,-79.4184086426847,-79.3349490343202,-79.2993585067462,-79.3314028573047,-79.3796696949764,-79.4011796784615,-79.3243183021594,-79.510576666337,-79.4060383803652,-79.1508435345544,-79.4080065530123,-79.5333449009471,-79.5734318303351,-79.5445601460069,-79.4276836541259,-79.3849244760296,-79.3978710450282,-79.3556293026334,-79.2995999790743,-79.3660723181311,-79.3354879644225,-79.3790355585366,-79.4143179485015,-79.4059373195385,-79.3512604307298,-79.4035903123087,-79.4960458957523,-79.4039781808624,-79.4857086407116,-79.3298188500995,-79.3154075136922,-79.3111636645474,-79.3789057054568,-79.3373941092076],{"iconUrl":{"data":"data:image/png;base64,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","index":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"iconWidth":[48,47.9223928352555,47.6497723788314,46.4232129557063,45.1633545533021,41.1077625536198,40.743969889923,40.0529536403375,38.7781061757579,38.4406892664043,38.1978524123753,37.2606415934397,35.0471641601776,34.295682834232,31.9353142657722,31.8769848759557,31.8185485575659,31.7600047203783,31.4064500542178,30.9287575766349,30.5655893187728,29.9505246312413,29.7009325745788,28.9392433580931,28.6158897079977,28.6158897079977,28.4201116529317,28.3545519078221,28.0244527428232,27.4202618384503,27.3523056947206,27.2841802945538,27.0099604675535,26.9409693958305,26.9409693958305,26.5933294197705,26.3119106060643,25.448989176012,25.3757545229506,25.2286474600917,24.7820874390197,24.4798555540735,24.4798555540735,24.173845330468,24.0967355795274,23.9417710423896,23.6287932565184,23.1513946864745,22.9900589600258,22.9900589600258,22.8275830092019,22.8275830092019,22.8275830092019,22.581677276651,22.4991114525683,22.4991114525683,22.4162415155476,22.2495756979746,22.1657728551967,21.9972093985741,21.7419139891025,21.7419139891025,21.6561467356915,21.6561467356915,21.2221117959349,21.0459916405881,20.5991043925958,20.5085584404495,20.5085584404495,20.4176109482379,20.3262565260275,19.8631830783294,19.5800828544735,19.4848020805015,19.0989262061877,18.9030346052147,18.8043235670475,18.6053304155223,18.0982777498887,18.0982777498887,18.0982777498887,17.9951528207011,17.7871093800238,17.4703996142545,17.2560307642948,16.7080799429391,16.4838002425468,16.3705081767323,15.9092742787829,15.9092742787829,15.7918610558039,15.6735682961503,15.6735682961503,15.6735682961503,15.4342631243163,15.4342631243163,15.4342631243163,15.3132082111784,15.3132082111784,15.1911886713046,15.1911886713046,15.0681810705687,14.9441610103651,14.9441610103651,14.6929807513744,14.3079448539989,14.177275953911,13.7778356812004,13.5049802337768,13.3664639543513,13.3664639543513,13.3664639543513,13.0850331944369,12.9420230732211,12.9420230732211,12.7974149247439,12.6511539507007,12.6511539507007,12.5031821474615,12.5031821474615,12.3534380372782,12.3534380372782,12.3534380372782,12.2018563697965,12.2018563697965,12.0483677897637,11.7353696769193,11.7353696769193,11.4137915046009,11.0828864275983,10.9136721178215,10.7417925237637,10.5671175895728,10.5671175895728,10.5671175895728,10.3895063251402,10.3895063251402,10.2088054741189,10.0248479657635,9.8374511061018],"iconHeight":[43,42.9304769149163,42.6862544227031,41.5874616061535,40.4588384539998,36.8257039542844,36.4998063597227,35.880770969469,34.7387201157831,34.4364508011539,34.2189094527529,33.3793247607897,31.3964178934924,30.7232158723328,28.6087190297543,28.5564656180436,28.5041164161528,28.4516708953389,28.1349448402368,27.7070119957354,27.381673764734,26.830678315487,26.6070854313935,25.924738841625,25.6350678634146,25.6350678634146,25.4596833557513,25.4009527507573,25.1052389154458,24.5639845636118,24.5031071848539,24.4420781805378,24.19642291885,24.1346184170982,24.1346184170982,23.8231909385444,23.5710865845993,22.7980528035107,22.7324467601432,22.6006633496655,22.2006199974551,21.9298706005242,21.9298706005242,21.6557364418776,21.5866589566599,21.4478365588073,21.1674606256311,20.7397910733,20.5952611516897,20.5952611516897,20.4497097790767,20.4497097790767,20.4497097790767,20.2294192269999,20.1554540095924,20.1554540095924,20.0812163576781,19.9319115627689,19.8568381827804,19.705833419556,19.4771312819043,19.4771312819043,19.4002981173903,19.4002981173903,19.011475150525,18.8537008446935,18.4533643517004,18.3722502695693,18.3722502695693,18.2907764744631,18.2089381378996,17.7941015076701,17.5404908904658,17.455135197116,17.1094547263765,16.9339685005049,16.8455398621467,16.6672751639054,16.2130404842753,16.2130404842753,16.2130404842753,16.1206577352114,15.9342854862713,15.650566321103,15.4585275596807,14.967654948883,14.7667377172815,14.6652469083227,14.2520582080764,14.2520582080764,14.1468755291577,14.040904931968,14.040904931968,14.040904931968,13.8265273822,13.8265273822,13.8265273822,13.7180823558473,13.7180823558473,13.6087731847104,13.6087731847104,13.4985788757178,13.3874775717854,13.3874775717854,13.1624619231062,12.8175339317073,12.7004763753786,12.3426444644087,12.098211459425,11.9741239591064,11.9741239591064,11.9741239591064,11.7220089033497,11.5938956697605,11.5938956697605,11.4643508700831,11.3333254141694,11.3333254141694,11.2007673404343,11.2007673404343,11.0666215750617,11.0666215750617,11.0666215750617,10.9308296646094,10.9308296646094,10.79332947833,10.5129353355736,10.5129353355736,10.2248548895384,9.92841909139018,9.77683127221512,9.62285580253834,9.46637617399226,9.46637617399226,9.46637617399226,9.30726608293814,9.30726608293814,9.14538823723154,8.98059296932978,8.81271661588286],"iconAnchorX":[24,23.9611964176277,23.8248861894157,23.2116064778531,22.581677276651,20.5538812768099,20.3719849449615,20.0264768201687,19.3890530878789,19.2203446332022,19.0989262061877,18.6303207967198,17.5235820800888,17.147841417116,15.9676571328861,15.9384924379778,15.9092742787829,15.8800023601891,15.7032250271089,15.4643787883174,15.2827946593864,14.9752623156206,14.8504662872894,14.4696216790465,14.3079448539989,14.3079448539989,14.2100558264659,14.177275953911,14.0122263714116,13.7101309192252,13.6761528473603,13.6420901472769,13.5049802337768,13.4704846979153,13.4704846979153,13.2966647098853,13.1559553030321,12.724494588006,12.6878772614753,12.6143237300458,12.3910437195099,12.2399277770368,12.2399277770368,12.086922665234,12.0483677897637,11.9708855211948,11.8143966282592,11.5756973432372,11.4950294800129,11.4950294800129,11.4137915046009,11.4137915046009,11.4137915046009,11.2908386383255,11.2495557262841,11.2495557262841,11.2081207577738,11.1247878489873,11.0828864275983,10.9986046992871,10.8709569945513,10.8709569945513,10.8280733678458,10.8280733678458,10.6110558979675,10.522995820294,10.2995521962979,10.2542792202247,10.2542792202247,10.2088054741189,10.1631282630137,9.93159153916469,9.79004142723673,9.74240104025076,9.54946310309384,9.45151730260736,9.40216178352373,9.30266520776115,9.04913887494435,9.04913887494435,9.04913887494435,8.99757641035056,8.8935546900119,8.73519980712726,8.62801538214739,8.35403997146956,8.24190012127342,8.18525408836615,7.95463713939147,7.95463713939147,7.89593052790195,7.83678414807514,7.83678414807514,7.83678414807514,7.71713156215815,7.71713156215815,7.71713156215815,7.6566041055892,7.6566041055892,7.59559433565229,7.59559433565229,7.53409053528434,7.47208050518254,7.47208050518254,7.3464903756872,7.15397242699943,7.08863797695552,6.88891784060019,6.75249011688838,6.68323197717565,6.68323197717565,6.68323197717565,6.54251659721845,6.47101153661054,6.47101153661054,6.39870746237195,6.32557697535034,6.32557697535034,6.25159107373077,6.25159107373077,6.17671901863911,6.17671901863911,6.17671901863911,6.10092818489826,6.10092818489826,6.02418389488184,5.86768483845967,5.86768483845967,5.70689575230047,5.54144321379917,5.45683605891076,5.37089626188187,5.28355879478638,5.28355879478638,5.28355879478638,5.19475316257012,5.19475316257012,5.10440273705947,5.01242398288174,4.9187255530509],"iconAnchorY":[22,21.9644300494921,21.8394790069644,21.277305938032,20.6998708369301,18.8410578370757,18.6743195328814,18.3576037518213,17.773298663889,17.618649247102,17.5073490223387,17.0777940636598,16.0632835734147,15.7188546323563,14.6370190384789,14.610284734813,14.5835014222177,14.5566688301734,14.3946229415165,14.1756805559576,14.0092284377709,13.7273237893189,13.6129274300153,13.2638198724593,13.1156161161656,13.1156161161656,13.0258845075937,12.9958362910851,12.8445408404607,12.5676200092897,12.5364734434136,12.5052493016705,12.3795652142954,12.3479443064223,12.3479443064223,12.1886093173948,12.0596256944461,11.6641200390055,11.6305541563523,11.5631300858753,11.358456742884,11.219933795617,11.219933795617,11.0796791097978,11.0443371406167,10.9733117277619,10.8298635759043,10.6110558979675,10.5371103566785,10.5371103566785,10.4626422125509,10.4626422125509,10.4626422125509,10.3499354184651,10.3120927490938,10.3120927490938,10.274110694626,10.197722194905,10.1593125586318,10.0820543076798,9.96504391167198,9.96504391167198,9.92573392052529,9.92573392052529,9.7268012398035,9.6460795019362,9.44125617993974,9.39975595187267,9.39975595187267,9.35807168460902,9.31620090776259,9.10395891090097,8.97420464163367,8.93053428689653,8.75367451116935,8.66389086072341,8.61864830156342,8.52744310711439,8.29504396869899,8.29504396869899,8.29504396869899,8.24777837615468,8.15242513251091,8.00726648986666,7.90901410030177,7.6578699738471,7.5550751111673,7.5031495810023,7.29175071110885,7.29175071110885,7.23793631724345,7.18371880240221,7.18371880240221,7.18371880240221,7.07403726531164,7.07403726531164,7.07403726531164,7.01855376345677,7.01855376345677,6.9626281410146,6.9626281410146,6.90624965734398,6.84940712975066,6.84940712975066,6.73428284437993,6.55780805808281,6.49791814554256,6.31484135388351,6.18978260714768,6.12629597907768,6.12629597907768,6.12629597907768,5.99730688078357,5.93176057522633,5.93176057522633,5.86548184050763,5.79844556073781,5.79844556073781,5.73062515091987,5.73062515091987,5.66199243375252,5.66199243375252,5.66199243375252,5.5925175028234,5.5925175028234,5.52216857030836,5.37871110192137,5.37871110192137,5.23132110627544,5.07965627931591,5.0020997206682,4.92332157339171,4.84326222855418,4.84326222855418,4.84326222855418,4.76185706568928,4.76185706568928,4.67903584230451,4.59472198430826,4.50883175696332]},["West.Humber.Clairville..1.","Glenfield.Jane.Heights..25.","Mount.Olive.Silverstone.Jamestown..2.","Downsview.Roding.CFB..26.","York.University.Heights..27.","Islington.City.Centre.West..14.","Waterfront.Communities.The.Island..77.","Weston..113.","Woburn..137.","Kingsview.Village.The.Westway..6.","Rouge..131.","Black.Creek..24.","Malvern..132.","Newtonbrook.West..36.","Yorkdale.Glen.Park..31.","Moss.Park..73.","South.Parkdale..85.","Westminster.Branson..35.","Mount.Dennis..115.","Clairlea.Birchmount..120.","North.St.James.Town..74.","Englemount.Lawrence..32.","Morningside..135.","Mount.Pleasant.West..104.","Birchcliffe.Cliffside..122.","Brookhaven.Amesbury..30.","Humbermede..22.","Willowridge.Martingrove.Richview..7.","Mimico..includes.Humber.Bay.Shores...17.","Humber.Heights.Westmount..8.","Bendale..127.","Dorset.Park..126.","Niagara..82.","Church.Yonge.Corridor..75.","Maple.Leaf..29.","Rockcliffe.Smythe..111.","Humber.Summit..21.","Rexdale.Kipling..4.","Annex..95.","Flemingdon.Park..44.","West.Hill..136.","Bathurst.Manor..34.","Guildwood..140.","Eglinton.East..138.","Thorncliffe.Park..55.","Dovercourt.Wallace.Emerson.Junction..93.","Kensington.Chinatown..78.","Oakwood.Village..107.","L.Amoreaux..117.","Rustic..28.","Etobicoke.West.Mall..13.","Parkwoods.Donalda..45.","Scarborough.Village..139.","Thistletown.Beaumond.Heights..3.","Edenbridge.Humber.Valley..9.","Pelmo.Park.Humberlea..23.","Kennedy.Park..124.","Bayview.Woods.Steeles..49.","Beechborough.Greenbrook..112.","Tam.O.Shanter.Sullivan..118.","Elms.Old.Rexdale..5.","Little.Portugal..84.","Agincourt.North..129.","Briar.Hill.Belgravia..108.","Bedford.Park.Nortown..39.","Wexford.Maryvale..119.","Henry.Farm..53.","Eringate.Centennial.West.Deane..11.","Willowdale.East..51.","New.Toronto..18.","High.Park.Swansea..87.","Taylor.Massey..61.","Victoria.Village..43.","Wychwood..94.","Bay.Street.Corridor..76.","O.Connor.Parkview..54.","Don.Valley.Village..47.","Clanton.Park..33.","Keelesdale.Eglinton.West..110.","Oakridge..121.","Stonegate.Queensway..16.","Dufferin.Grove..83.","Agincourt.South.Malvern.West..128.","Corso.Italia.Davenport..92.","Hillcrest.Village..48.","Trinity.Bellwoods..81.","High.Park.North..88.","Cliffcrest..123.","Junction.Area..90.","Willowdale.West..37.","Steeles..116.","Banbury.Don.Mills..42.","Milliken..130.","Weston.Pellam.Park..91.","Cabbagetown.South.St.James.Town..71.","Highland.Creek..134.","Roncesvalles..86.","Bayview.Village..52.","Playter.Estates.Danforth..67.","Alderwood..20.","Lansing.Westgate..38.","Caledonia.Fairbank..109.","Regent.Park..72.","South.Riverdale..70.","Ionview..125.","Forest.Hill.North..102.","Palmerston.Little.Italy..80.","Pleasant.View..46.","East.End.Danforth..62.","Danforth.East.York..59.","Rosedale.Moore.Park..98.","University..79.","Greenwood.Coxwell..65.","Kingsway.South..15.","Lawrence.Park.South..103.","Centennial.Scarborough..133.","Casa.Loma..96.","Long.Branch..19.","Markland.Wood..12.","Princess.Rosethorn..10.","Humewood.Cedarvale..106.","Mount.Pleasant.East..99.","Yonge.St.Clair..97.","Broadview.North..57.","The.Beaches..63.","Leaside.Bennington..56.","Old.East.York..58.","St.Andrew.Windfields..40.","Forest.Hill.South..101.","Newtonbrook.East..50.","North.Riverdale..68.","Yonge.Eglinton..100.","Lambton.Baby.Point..114.","Lawrence.Park.North..105.","Runnymede.Bloor.West.Village..89.","Danforth..66.","Woodbine.Corridor..64.","Woodbine.Lumsden..60.","Bridle.Path.Sunnybrook.York.Mills..41.","Blake.Jones..69."],"neighbourhood_covid",{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250,"pane":"tmap401"},["<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>West Humber-Clairville (1)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>619<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Glenfield-Jane Heights (25)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>617<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Mount Olive-Silverstone-Jamestown (2)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>610<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Downsview-Roding-CFB (26)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>579<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>York University Heights (27)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>548<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Islington-City Centre West (14)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>454<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Waterfront Communities-The Island (77)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>446<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Weston (113)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>431<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Woburn (137)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>404<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Kingsview Village-The Westway (6)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>397<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Rouge (131)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>392<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Black Creek (24)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>373<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Malvern (132)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>330<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Newtonbrook West (36)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>316<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Yorkdale-Glen Park (31)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>274<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Moss Park (73)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>273<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>South Parkdale (85)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>272<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Westminster-Branson (35)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>271<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Mount Dennis (115)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>265<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Clairlea-Birchmount (120)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>257<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>North St.James Town (74)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>251<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Englemount-Lawrence (32)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>241<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Morningside (135)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>237<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Mount Pleasant West (104)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>225<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Birchcliffe-Cliffside (122)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>220<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Brookhaven-Amesbury (30)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>220<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Humbermede (22)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>217<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Willowridge-Martingrove-Richview (7)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>216<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Mimico (includes Humber Bay Shores) (17)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>211<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Humber Heights-Westmount (8)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>202<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bendale (127)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>201<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Dorset Park (126)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>200<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Niagara (82)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>196<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Church-Yonge Corridor (75)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>195<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Maple Leaf (29)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>195<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Rockcliffe-Smythe (111)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>190<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Humber Summit (21)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>186<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Rexdale-Kipling (4)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>174<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Annex (95)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>173<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Flemingdon Park (44)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>171<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>West Hill (136)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>165<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bathurst Manor (34)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>161<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Guildwood (140)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>161<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Eglinton East (138)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>157<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Thorncliffe Park (55)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>156<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Dovercourt-Wallace Emerson-Junction (93)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>154<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Kensington-Chinatown (78)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>150<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Oakwood Village (107)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>144<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>L'Amoreaux (117)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>142<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Rustic (28)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>142<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Etobicoke West Mall (13)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>140<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Parkwoods-Donalda (45)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>140<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Scarborough Village (139)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>140<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Thistletown-Beaumond Heights (3)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>137<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Edenbridge-Humber Valley (9)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>136<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Pelmo Park-Humberlea (23)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>136<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Kennedy Park (124)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>135<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bayview Woods-Steeles (49)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>133<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Beechborough-Greenbrook (112)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>132<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Tam O'Shanter-Sullivan (118)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>130<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Elms-Old Rexdale (5)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>127<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Little Portugal (84)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>127<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Agincourt North (129)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>126<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Briar Hill-Belgravia (108)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>126<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bedford Park-Nortown (39)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>121<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Wexford/Maryvale (119)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>119<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Henry Farm (53)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>114<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Eringate-Centennial-West Deane (11)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>113<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Willowdale East (51)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>113<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>New Toronto (18)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>112<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>High Park-Swansea (87)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>111<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Taylor-Massey (61)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>106<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Victoria Village (43)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>103<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Wychwood (94)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>102<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bay Street Corridor (76)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>98<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>O'Connor-Parkview (54)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>96<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Don Valley Village (47)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>95<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Clanton Park (33)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>93<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Keelesdale-Eglinton West (110)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>88<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Oakridge (121)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>88<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Stonegate-Queensway (16)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>88<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Dufferin Grove (83)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>87<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Agincourt South-Malvern West (128)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>85<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Corso Italia-Davenport (92)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>82<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Hillcrest Village (48)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>80<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Trinity-Bellwoods (81)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>75<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>High Park North (88)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>73<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Cliffcrest (123)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>72<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Junction Area (90)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>68<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Willowdale West (37)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>68<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Steeles (116)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>67<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Banbury-Don Mills (42)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>66<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Milliken (130)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>66<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Weston-Pellam Park (91)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>66<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Cabbagetown-South St.James Town (71)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>64<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Highland Creek (134)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>64<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Roncesvalles (86)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>64<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bayview Village (52)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>63<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Playter Estates-Danforth (67)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>63<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Alderwood (20)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>62<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Lansing-Westgate (38)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>62<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Caledonia-Fairbank (109)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>61<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Regent Park (72)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>60<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>South Riverdale (70)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>60<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Ionview (125)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>58<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Forest Hill North (102)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>55<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Palmerston-Little Italy (80)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>54<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Pleasant View (46)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>51<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>East End-Danforth (62)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>49<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Danforth East York (59)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>48<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Rosedale-Moore Park (98)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>48<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>University (79)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>48<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Greenwood-Coxwell (65)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>46<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Kingsway South (15)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>45<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Lawrence Park South (103)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>45<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Centennial Scarborough (133)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>44<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Casa Loma (96)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>43<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Long Branch (19)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>43<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Markland Wood (12)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>42<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Princess-Rosethorn (10)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>42<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Humewood-Cedarvale (106)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>41<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Mount Pleasant East (99)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>41<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Yonge-St.Clair (97)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>41<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Broadview North (57)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>40<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>The Beaches (63)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>40<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Leaside-Bennington (56)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>39<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Old East York (58)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>37<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>St.Andrew-Windfields (40)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>37<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Forest Hill South (101)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>35<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Newtonbrook East (50)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>33<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>North Riverdale (68)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>32<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Yonge-Eglinton (100)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>31<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Lambton Baby Point (114)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>30<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Lawrence Park North (105)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>30<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Runnymede-Bloor West Village (89)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>30<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Danforth (66)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>29<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Woodbine Corridor (64)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>29<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Woodbine-Lumsden (60)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>28<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Bridle Path-Sunnybrook-York Mills (41)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>27<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Blake-Jones (69)<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>n<\/nobr><\/td><td align=\"right\"><nobr>26<\/nobr><\/td><\/tr><\/table><\/div>"],null,null,null,["West Humber-Clairville (1)","Glenfield-Jane Heights (25)","Mount Olive-Silverstone-Jamestown (2)","Downsview-Roding-CFB (26)","York University Heights (27)","Islington-City Centre West (14)","Waterfront Communities-The Island (77)","Weston (113)","Woburn (137)","Kingsview Village-The Westway (6)","Rouge (131)","Black Creek (24)","Malvern (132)","Newtonbrook West (36)","Yorkdale-Glen Park (31)","Moss Park (73)","South Parkdale (85)","Westminster-Branson (35)","Mount Dennis (115)","Clairlea-Birchmount (120)","North St.James Town (74)","Englemount-Lawrence (32)","Morningside (135)","Mount Pleasant West (104)","Birchcliffe-Cliffside (122)","Brookhaven-Amesbury (30)","Humbermede (22)","Willowridge-Martingrove-Richview (7)","Mimico (includes Humber Bay Shores) (17)","Humber Heights-Westmount (8)","Bendale (127)","Dorset Park (126)","Niagara (82)","Church-Yonge Corridor (75)","Maple Leaf (29)","Rockcliffe-Smythe (111)","Humber Summit (21)","Rexdale-Kipling (4)","Annex (95)","Flemingdon Park (44)","West Hill (136)","Bathurst Manor (34)","Guildwood (140)","Eglinton East (138)","Thorncliffe Park (55)","Dovercourt-Wallace Emerson-Junction (93)","Kensington-Chinatown (78)","Oakwood Village (107)","L'Amoreaux (117)","Rustic (28)","Etobicoke West Mall (13)","Parkwoods-Donalda (45)","Scarborough Village (139)","Thistletown-Beaumond Heights (3)","Edenbridge-Humber Valley (9)","Pelmo Park-Humberlea (23)","Kennedy Park (124)","Bayview Woods-Steeles (49)","Beechborough-Greenbrook (112)","Tam O'Shanter-Sullivan (118)","Elms-Old Rexdale (5)","Little Portugal (84)","Agincourt North (129)","Briar Hill-Belgravia (108)","Bedford Park-Nortown (39)","Wexford/Maryvale (119)","Henry Farm (53)","Eringate-Centennial-West Deane (11)","Willowdale East (51)","New Toronto (18)","High Park-Swansea (87)","Taylor-Massey (61)","Victoria Village (43)","Wychwood (94)","Bay Street Corridor (76)","O'Connor-Parkview (54)","Don Valley Village (47)","Clanton Park (33)","Keelesdale-Eglinton West (110)","Oakridge (121)","Stonegate-Queensway (16)","Dufferin Grove (83)","Agincourt South-Malvern West (128)","Corso Italia-Davenport (92)","Hillcrest Village (48)","Trinity-Bellwoods (81)","High Park North (88)","Cliffcrest (123)","Junction Area (90)","Willowdale West (37)","Steeles (116)","Banbury-Don Mills (42)","Milliken (130)","Weston-Pellam Park (91)","Cabbagetown-South St.James Town (71)","Highland Creek (134)","Roncesvalles (86)","Bayview Village (52)","Playter Estates-Danforth (67)","Alderwood (20)","Lansing-Westgate (38)","Caledonia-Fairbank (109)","Regent Park (72)","South Riverdale (70)","Ionview (125)","Forest Hill North (102)","Palmerston-Little Italy (80)","Pleasant View (46)","East End-Danforth (62)","Danforth East York (59)","Rosedale-Moore Park (98)","University (79)","Greenwood-Coxwell (65)","Kingsway South (15)","Lawrence Park South (103)","Centennial Scarborough (133)","Casa Loma (96)","Long Branch (19)","Markland Wood (12)","Princess-Rosethorn (10)","Humewood-Cedarvale (106)","Mount Pleasant East (99)","Yonge-St.Clair (97)","Broadview North (57)","The Beaches (63)","Leaside-Bennington (56)","Old East York (58)","St.Andrew-Windfields (40)","Forest Hill South (101)","Newtonbrook East (50)","North Riverdale (68)","Yonge-Eglinton (100)","Lambton Baby Point (114)","Lawrence Park North (105)","Runnymede-Bloor West Village (89)","Danforth (66)","Woodbine Corridor (64)","Woodbine-Lumsden (60)","Bridle Path-Sunnybrook-York Mills (41)","Blake-Jones (69)"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["Esri.WorldGrayCanvas","OpenStreetMap","Esri.WorldTopoMap"],"neighbourhood_covid",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[43.5923616750662,43.8212018181319],"lng":[-79.5963636708595,-79.1508435345544]},"fitBounds":[43.5809960000775,-79.6392649324429,43.8554571861712,-79.1154514950547,[]]},"evals":[],"jsHooks":[]}</script>
+
+```r
+tmap_mode(current.mode)
+```
+
+
+---
+
+
+## Let's create a few maps based on geography and the outcome of cases
+
+
+
+
+&lt;table class=" lightable-material lightable-striped lightable-hover" style='font-family: "Source Sans Pro", helvetica, sans-serif; margin-left: auto; margin-right: auto;'&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Neighbourhood.Name &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ACTIVE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; FATAL &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; RESOLVED &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Agincourt North &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Agincourt South-Malvern West &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Alderwood &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Annex &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 116 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Banbury-Don Mills &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 54 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bathurst Manor &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 130 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: split-two
+
+
+# Quickly create multiple maps
+
+Use `c()` to list out the column names to map in multiples. By default individual scales are created for each map.
+We can quickly create multiple maps by this methodology - but look at the legends for each map. 
+
+Having three separate legends with different breaks can make it difficult to interpret across maps.
+
+
+
+```r
+tm_shape(toronto_outcomes) +
+* tm_fill(c("ACTIVE","FATAL"),
+          palette = brewer.pal("Greens", n = 6)) +
+  tm_borders("black", lwd=0.5)
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/toronto_outcomes_map-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Let's create a custom scale `outcome_breaks`
+
+
+
+```r
+*outcome_breaks &lt;- c(0,1,15,30,45,60,75,80)
+
+tm_shape(toronto_outcomes) +
+  tm_fill(c("ACTIVE","FATAL"),breaks = outcome_breaks,title="Cases")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(panel.labels =c("Active Cases","Fatal Cases"),legend.outside = TRUE
+            )
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/outcomes breaks-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: bg-main3
+
+##Facets allow you to plot many of the same plots by a specific variable
+# By Age
+
+
+
+
+
+```r
+tm_shape(toronto_age) + 
+  tm_fill("n", title = "Total Cases",style ="pretty",n=6)+
+* tm_facets(by="Age.Group")
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/by age-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+tm_shape(toronto_age) + 
+  tm_fill("n", title = "Total Cases",style ="pretty",n=6)+
+* tm_facets(by="Age.Group")
+```
+
+&lt;img src="Mapping-Viz-Prez_files/figure-html/by age2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: bg-main3
+## Saving
+
+## Assign map to a variable `outcomes_map`. 
+## Use `tmap_save` to save the map, name the file and width/height.
+
+
+```r
+*outcomes_map &lt;- tm_shape(toronto_outcomes) +
+  tm_fill(c("ACTIVE","FATAL"),breaks = outcome_breaks,title="Cases")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(panel.labels =c("Active Cases","Fatal Cases"),
+            legend.outside = TRUE
+            )
+
+tmap_save(outcomes_map, filename= "outcomes_map.png", width= 600, height= 800)
+```
+
+---
+
+# References
+
+
+## Artwork by @allison_horst
+
+## https://www.jstatsoft.org/article/view/v084i06
+
+## https://mgimond.github.io/Spatial/
+
+---
+class: middle center bg-main1
+
+# Thank you!
+## Stay Safe and be kind to yourself :) <span>&lt;i class="fas  fa-smile faa-burst animated "&gt;&lt;/i&gt;</span>
+
+---
+class: middle center bg-main1
+# Making Maps in R
+## Quick introduction to tmap
+###  Lauren Yee
+### <span>&lt;i class="fas  fa-envelope faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt; lauren@mapdatascience.com</span> 
+### <span>&lt;i class="fab  fa-twitter faa-float animated "&gt;&lt;/i&gt;@EcoLaurenY</span> 
+### <span>&lt;i class="fas  fa-chevron-right faa-pulse animated faa-slow " style=" color:black;"&gt;&lt;/i&gt;</span>[Website](http://www.mapdatascience.com/)
+### Guest Lecture UofT 2020/10/29
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "pygments",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

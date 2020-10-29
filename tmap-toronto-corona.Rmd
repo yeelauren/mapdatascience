@@ -1,0 +1,391 @@
+---
+title: "Creating maps using tmap for Toronto Coronavirus Cases"
+author: |
+  | Lauren Yee
+  | lauren@mapdatascience.com
+  | [www.mapdatascience.com](www.mapdatascience.com)
+date: "28/10/2020"
+output: 
+  html_document:
+    toc: TRUE
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.path = './Figures/', dev="png",dpi=300)
+library(sf)
+library(dplyr)
+library(tmap)
+library(readr)
+library(stringr)
+library(RColorBrewer)
+library(viridis)
+library(tidyr)
+```
+
+
+This document serves as a mini-tutorial on using tmap library for creating thematic maps in R. 
+We will be visualizing COVID-19 Cases in Toronto Neighbourhoods.
+
+Disclaimer!!
+
+This data is based solely on COVID-19 cases and does not consider, population, population density, multi-generational homes, long-term care, socioeconomics, access to care, unhoused populations or other factors that would impact the number of cases in a given neighbourhood.
+
+Please note, this tutorial serves as a basis for quickly illustrating how tmap works for a Guest Lecture at University of Toronto. It is not an exhaustive resource for interpreting public health data, as COVID-19-19 is still ongoing the data presented in this tutorial is taken as a snapshot in time from the beginning of October 2020. This data is subject to change and may differ from official data sources, as they remove duplicates and resolve data issues. There is only so much that can be interpreted from maps or visualizations alone and subject matter experts (epidemiologists, public health researchers, virologists, etc.) should always be consulted when examining public health data - especially in this climate.
+
+
+
+# Metadata 
+
+The metadata for COVID-19 cases by Toronto neighbourhood is available here:
+
+https://open.toronto.ca/dataset/covid-19-cases-in-toronto/
+
+**Toronto Neighbourhoods** were also downloaded from the Toronto Open data portal:
+
+https://open.toronto.ca/dataset/neighbourhoods/
+
+Please review the metadata page for explanations of column names and important characteristics of the data.
+
+## Read in toronto neighbourhoods and covid data
+
+```{r}
+
+toronto <- st_read("./outputs/toronto_neighbourhoods.gpkg")
+neighbourhood_covid<-st_read("./outputs/toronto_neighbourhoods_covid.gpkg")
+
+covid<- read_csv('./Data/COVID19 cases.csv')
+covid<-tibble(covid, .name_repair = make.names)
+
+```
+
+# Missing Data
+
+We can calculate the total number of COVID-19 cases per neighbourhood:
+
+```{r}
+
+covid_counts <- covid %>%
+  group_by(Neighbourhood.Name)%>%
+  count()
+
+covid %>%filter(is.na(Neighbourhood.Name))
+```
+
+There is missing neighbourhoods in some of the COVID-19 data (n=721). From Toronto's open data website for the COVID-19-19 cases, the metadata indicates that neighbourhood name is created by: 
+
+>Client postal code information is mapped to the most up-to-date census tract (CT) and neighbourhood information available from the city. As a result, neighbourhood information is not available for those with missing postal code or when postal code could not be mapped/linked to a CT. 
+
+Therefore, the missing data may be because of a missing postal code or for people who were tested in Toronto but live outside the city.
+
+Let's remove them for now
+
+```{r}
+
+covid_counts<-covid_counts %>%filter(!is.na("Neighbourhood.Name"))
+```
+
+
+# Tmap
+
+## Create map of total positive covid cases by neighbourhood
+
+Now that our counts are joined to the spatial neighbourhoods of Toronto, we can begin to map them with Tmap.
+
+>Like ggplot2, tmap is based on the idea of a ‘grammar of graphics’ (Wilkinson and Wills 2005). This involves a separation between the input data and the aesthetics (how data are visualised): each input dataset can be ‘mapped’ in a range of different ways including location on the map (defined by data’s geometry), color, and other visual variables. The basic building block is tm_shape() (which defines input data, raster and vector objects), followed by one or more layer elements such as tm_fill() and tm_borders() 
+
+- [Geocomputation in R](https://geocompr.robinlovelace.net/adv-map.html)
+
+We want to map the shape of the neighbourhoods `neighbourhood_covid` and show the differences in the total number of cases `n` by using `tm_fill`. We can add a white border with a line width `lwd = 0.5` of 0.5.
+
+```{r tmap}
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n")+
+  tm_borders("white", lwd=0.5)
+
+
+
+```
+
+
+We can change the colour palette:
+
+```{r tmap palette}
+ 
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",palette = brewer.pal("Greens", n = 6))+
+  tm_borders("black", lwd=0.5)
+
+
+```
+
+# Add Histogram to Map
+
+```{r tmap histo}
+
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",palette = brewer.pal("Greens", n = 6),
+          legend.hist = T)+
+  tm_borders("black", lwd=0.5)+
+  tm_legend(outside = TRUE, hist.width=2)+
+  tm_layout(legend.hist.size = 0.5)
+
+
+```
+
+# Proportional Symbol
+
+Use `tm_dots` for proportional symbols
+
+
+```{r}
+
+tm_shape(neighbourhood_covid)+
+  tm_dots(size="n")+
+  tm_borders("black", lwd=0.5)
+
+```
+
+# Add other map elements
+
+scale bar : `tm_scale_bar`
+
+compass : `tm_compass`
+
+main title `main.title` 
+
+```{r tmap elements}
+
+neighbourhood_covid<-st_transform(neighbourhood_covid,2958)
+
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",palette = brewer.pal("Greens", n = 6))+
+  tm_borders("black", lwd=0.5)+
+  tm_scale_bar(width = 0.22) +
+  tm_compass(position = c(0.85,0.4)) +
+  tm_layout(main.title = "Total Positive Covid Cases by Neighbourhood", bg.color = "lightgrey", inner.margins = c(0, 0, 0, 0),
+            frame.lwd = 5, title.size = 1)
+
+
+```
+
+# Subset Data to Display
+
+If we wanted to show the neighbourhoods that have more than 500 cases:
+
+First we can subset the data :
+
+```{r}
+
+over_500<-neighbourhood_covid %>%
+  filter(n>500)
+```
+
+First we want to show **ALL** the neighbourhoods like we have previously using `neighbourhood_covid` but this time we're going to set the fill for these to white and the border to grey, so that they take a backseat the neighbourhood we want to highlight.
+
+Then we can take our new subset `over_500` and display this in blue on top of `neighbourhood_covid`. This is where the `layered grammar` allows us to build up our maps.
+
+To label neighbourhood names `tm_text`
+
+
+```{r tmap_subset}
+tm_shape(neighbourhood_covid) +
+  tm_fill("white")+
+  tm_borders("grey", lwd=0.5)+
+tm_shape(over_500)+
+    tm_fill("lightblue")+
+    tm_borders("black")+
+    tm_text("Neighbourhood.Name", just="left", xmod=0.5, size=0.8, bg.color = "white", remove.overlap = TRUE)+
+  tm_layout(main.title = "Top 5 Neighbourhoods for Covid Cases", inner.margins = c(0, 0, 0, 0))
+
+```
+
+
+# Add basemaps
+
+Using library `rosm`. 
+
+`osm.raster` will download tiles directly to your computer (may take some time) based on the square boundary or bounding box around Toronto. Type `?osm.raster` into the console to see the options available. `Type` changes the type of basemap to download while crop, crops the basemap to the bbox extent.
+
+`tm_rgb` will display the basemap raster. 
+
+````{r tmap basemap, message=FALSE, warning=FALSE}
+library(rosm)
+bg <- osm.raster(st_bbox(toronto),crop=TRUE)
+
+tm_shape(bg)+
+  tm_rgb()+
+tm_shape(toronto)+
+  tm_borders()
+
+
+bg_hotstyle<-osm.raster(st_bbox(toronto), type="hotstyle")
+
+tm_shape(bg_hotstyle)+
+  tm_rgb()+
+tm_shape(toronto)+
+  tm_borders(col = "black")+
+  tm_style("classic")
+```
+
+
+# Create Custom Icons for Tmap
+
+tmap contains two modes:
+
+plot: static maps, shown in graphics device window; can be exported to png, jpg, pdf, etc.
+
+`tmap_mode("plot")`
+
+view: interactive maps, shown in the viewing window or in the browser; can be exported to standalone HTML files
+
+`tmap_mode("view")`
+
+To use our own symbols in tmap, we can use any photo you like. I searched the noun project for "corona" and downloaded that to the images/ folder. 
+
+https://thenounproject.com/search/?q=corona
+
+Once you have an image, assign it to a variable `cv` and use `tmap_icons` to load the image.
+This method requires an interactive map (not covered here) so make sure tmap is in view mode!
+
+Using `tm_symbols` we assign our shape to our variable `cv` e.g. what shape do you want to symbolize your data?
+We will then scale the size of the SARS-CoV-2 image to the number of positive cases.
+
+
+```{r tmap icons}
+cv<-tmap_icons('./Images/noun_virus_3364091.png')
+current.mode <- tmap_mode("view")
+tm_shape(neighbourhood_covid)+
+  tm_symbols(shape=cv, size = "n")
+tmap_mode(current.mode)
+```
+
+**Note this graphic may not show correctly if viewing in html, try opening the actual .rmd provided to see how this works**
+
+```{r png map}
+knitr::include_graphics('images/corona_map.png')
+
+```
+
+## Quick multiples of maps
+
+Within the covid data we can also look at what specific outcomes there are. The three options are active, fatal or resolved. The resolved cases are significantly higher than the other two options since our data looks over the entire time period from the start of the pandemic.
+
+```{r outcomes}
+
+outcomes <- covid %>%group_by(Neighbourhood.Name, Outcome)%>%
+    count()%>%
+    pivot_wider(names_from = "Outcome", values_from = "n", values_fill = 0)
+
+toronto_outcomes <- toronto %>%
+  full_join(outcomes, by= "Neighbourhood.Name")
+
+tm_shape(toronto_outcomes) +
+  tm_fill(c("ACTIVE","FATAL","RESOLVED"),palette = brewer.pal("Greens", n = 6))+
+  tm_borders("black", lwd=0.5)
+
+```
+
+We can quickly create multiple maps by this methodology - but look at the legends for each map. 
+Having three separate legends with different breaks can make it difficult to interpret across maps.
+
+
+## Custom scale
+
+Custom scales can be created for any map, but caution should be used to make sure you are not hiding or misrepresenting your data. 
+
+`outcome_breaks` was created with custom intervals and specified in `tm_fill` in the `breaks` argument. 
+Aesthetically we can also generate just ONE legend outside of both maps so it is easier to read.
+
+I also removed `resolved` from being displayed as we are more interested in active and fatal cases:
+
+```{r outcomes breaks}
+
+toronto_outcomes<-toronto_outcomes %>% select(-RESOLVED)
+
+outcome_breaks <- c(0,1,15,30,45,60,75,80)
+
+tm_shape(toronto_outcomes) +
+  tm_fill(c("ACTIVE","FATAL"),breaks = outcome_breaks,title="Cases")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(panel.labels =c("Active Cases","Fatal Cases"),
+            legend.outside = TRUE
+            )
+
+```
+
+# Different Breaks
+
+Custom breaks as we saw above can impact how data is displayed. 
+There are many breaks pre-set in `tmap` that you can use. Below is an example of a few that can drastically impact how alike or how different neighbourhoods appear when visualizing the same data (number of cases):
+
+
+```{r tmap breaks}
+
+
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",style="equal", n=5,palette="YlOrRd")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(main.title = "Equal Interval", inner.margins = c(0, 0, 0, 0))
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",style="quantile", n=5,palette="YlOrRd")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(main.title = "Quantile Breaks", inner.margins = c(0, 0, 0, 0))
+
+
+
+tm_shape(neighbourhood_covid) +
+  tm_fill("n",style="jenks", n=5,palette="YlOrRd")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(main.title = "Natural Jenks", inner.margins = c(0, 0, 0, 0))
+
+
+```
+
+
+## By Age
+
+```{r by age}
+
+covid_age <- covid %>% group_by(Neighbourhood.Name,Age.Group)%>%
+  count()
+
+toronto_age<- toronto %>%full_join(covid_age, by="Neighbourhood.Name")
+
+
+tm_shape(toronto_age) + 
+  tm_fill("n", title = "Total Cases",style ="pretty",n=6)+
+  tm_facets(by="Age.Group")#<<
+
+```
+
+## Saving
+
+Assign map to a variable `outcomes_map`.  
+
+Use `tmap_save` to save the map to your hard drive.
+
+```{r save}
+outcomes_map <- tm_shape(toronto_outcomes) +
+  tm_fill(c("ACTIVE","FATAL"),breaks = outcome_breaks,title="Cases")+
+  tm_borders("black", lwd=0.5)+
+  tm_layout(panel.labels =c("Active Cases","Fatal Cases"),legend.outside = TRUE
+            )
+
+tmap_save(outcomes_map, filename= "outcomes_map.png", width= 600, height= 800)
+
+
+```
+
+
+
+
+
+
+
